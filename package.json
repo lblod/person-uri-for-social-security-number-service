@@ -1,5 +1,5 @@
 {
-  "name": "@lblod/request-uri-by-rrn-service",
+  "name": "@lblod/person-uri-for-social-security-number-service",
   "version": "0.0.1",
   "description": "Receives requests for the URI of a person based on their social security number",
   "scripts": {
