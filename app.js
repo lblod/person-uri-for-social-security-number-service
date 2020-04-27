@@ -27,7 +27,7 @@ async function handleRequest( req, res, next ) {
 
     // fetch uri and verify access
     const uri = await fetchPersonUri( infoRequest );
-    
+
     if( uri ) {
       // return the response
       res

@@ -43,7 +43,7 @@ export function extractInfoFromTriples( triples ) {
            triple.subject.value == dataRequest
            && triple.predicate.value == "http://data.lblod.info/vocabularies/data-request/requester" )
     .object.value;
-  
+
   const vendorKey = triples
     .find( (triple) =>
            triple.subject.value == vendor
