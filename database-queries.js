@@ -32,23 +32,43 @@ export async function fetchPersonUri( info ) {
          PREFIX rrn: <http://data.lblod.info/vocabularies/rrn/>
          PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
          PREFIX adms: <http://www.w3.org/ns/adms#>
-         PREFIX person: <http://www.w3.org/ns/person#>`;
+         PREFIX person: <http://www.w3.org/ns/person#>
+         PREFIX lblodlg: <http://data.lblod.info/vocabularies/leidinggevenden/>
+         PREFIX org: <http://www.w3.org/ns/org#>`;
 
   const personSelection =
-        `GRAPH ?g {
-          ?bestuursorgaan besluit:bestuurt ${sparqlEscapeUri(info.organization)}.
-          ?bestuursorgaanInTijd mandaat:isTijdspecialisatieVan ?bestuursorgaan.
-          ?verkiezing mandaat:steltSamen ?bestuursorgaanInTijd.
-          ?kandidatenlijst mandaat:behoortTot ?verkiezing.
-          ?kandidatenlijst mandaat:heeftKandidaat ?uri.
-         }
+        `  {
+              SELECT DISTINCT ?uri WHERE {
+                GRAPH ?public {
+                  ?bestuursorgaan besluit:bestuurt ${sparqlEscapeUri(info.organization)}.
+                  ?bestuursorgaanInTijd mandaat:isTijdspecialisatieVan ?bestuursorgaan.
 
-         GRAPH ?h {
-          ?uri a person:Person;
-             adms:identifier ?identifier.
+                  OPTIONAL {
+                    ?bestuursorgaanInTijd lblodlg:heeftBestuursfunctie ?bestuursfunctie.
+                  }
 
-          ?identifier skos:notation ${sparqlEscapeString(info.rrn)}.
-         }`;
+                  OPTIONAL {
+                    ?verkiezing mandaat:steltSamen ?bestuursorgaanInTijd.
+                    ?kandidatenlijst mandaat:behoortTot ?verkiezing.
+                    ?kandidatenlijst mandaat:heeftKandidaat ?uri.
+                  }
+                }
+
+                GRAPH ?loketGraph {
+                  OPTIONAL {
+                    ?functionaris org:holds ?bestuursfunctie.
+                    ?functionaris mandaat:isBestuurlijkeAliasVan ?uri.
+                  }
+                }
+
+              }
+            }
+
+            GRAPH ?loketGraph {
+              ?uri a person:Person;
+              adms:identifier ?identifier.
+              ?identifier skos:notation ${sparqlEscapeString(info.rrn)}.
+            }`;
 
   const accessValidation =
         `GRAPH ?h {
