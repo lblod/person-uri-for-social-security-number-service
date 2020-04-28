@@ -27,17 +27,27 @@ import { sparqlEscapeUri, sparqlEscapeString } from 'mu';
 export async function fetchPersonUri( info ) {
   const prefixes =
         `PREFIX mandaat: <http://data.vlaanderen.be/ns/mandaat#>
-         PREFIX generiek: <https://data.vlaanderen.be/ns/generiek#>
          PREFIX besluit: <http://data.vlaanderen.be/ns/besluit#>
          PREFIX dataClaim: <http://data.lblod.info/vocabularies/dataClaim/>
-         PREFIX rrn: <http://data.lblod.info/vocabularies/rrn/>`;
+         PREFIX rrn: <http://data.lblod.info/vocabularies/rrn/>
+         PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+         PREFIX adms: <http://www.w3.org/ns/adms#>
+         PREFIX person: <http://www.w3.org/ns/person#>`;
 
   const personSelection =
         `GRAPH ?g {
-           ?uri a foaf:Person;
-             adms:identifier ${sparqlEscapeString(info.rrn)};
-             ^mandaat:heeftKandidaat/mandaat:behoortTot/mandaat:steltSamen/generiek:isTijdspecialisatieVan/besluit:bestuurt
-               ${sparqlEscapeUri(info.organization)}.
+          ?bestuursorgaan besluit:bestuurt ${sparqlEscapeUri(info.organization)}.
+          ?bestuursorgaanInTijd mandaat:isTijdspecialisatieVan ?bestuursorgaan.
+          ?verkiezing mandaat:steltSamen ?bestuursorgaanInTijd.
+          ?kandidatenlijst mandaat:behoortTot ?verkiezing.
+          ?kandidatenlijst mandaat:heeftKandidaat ?uri.
+         }
+
+         GRAPH ?h {
+          ?uri a person:Person;
+             adms:identifier ?identifier.
+
+          ?identifier skos:notation ${sparqlEscapeString(info.rrn)}.
          }`;
 
   const accessValidation =
@@ -50,13 +60,13 @@ export async function fetchPersonUri( info ) {
              dataClaim:accessMode ${sparqlEscapeUri("http://data.lblod.info/codelists/access-modes/read")}.
          }`;
 
-  const results = await querySudo(
-     `SELECT ?uri WHERE {
-       ${prefixes}
+  const query = `
+      ${prefixes}
+      SELECT DISTINCT ?uri WHERE {
        ${personSelection}
        ${accessValidation}
-     }`
-  );
+     }`;
+  const results = await querySudo(query);
 
   return results.bindings.length && results.bindings[0].uri;
 }
