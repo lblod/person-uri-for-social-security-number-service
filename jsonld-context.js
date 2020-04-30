@@ -4,13 +4,13 @@ export default {
     "schema": "http://schema.org/memberOf",
     "requester": "dataRequest:requester",
     "dcterms": "http://purl.org/dc/terms/",
-    "adms": "http://www.w3.org/ns/adms#",
+    "skos": "http://www.w3.org/2004/02/skos/core#",
     "uri": {
       "@type": "@id",
       "@id": "@id"
     },
     "key": "muAccount:key",
-    "person": "dcterms:subject",
-    "rrn": "adms:identifier",
+    "person": "dataRequest:requestedPerson",
+    "rrn": "skos:notation",
     "organization": "schema:memberOf"
 };
