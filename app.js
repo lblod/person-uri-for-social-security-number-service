@@ -23,33 +23,45 @@ async function handleRequest( req, res, next ) {
 
     // extract triples
     const triples = await toRDF(body, {});
-    const infoRequest = extractInfoFromTriples( triples );
+    const  { organization, rrn, subject, vendorKey, vendor, dataRequest } = extractInfoFromTriples( triples );
 
-    // fetch uri and verify access
-    const uri = await fetchPersonUri( infoRequest );
-
-    if( uri ) {
-      // return the response
-      res
-        .status(200)
-        .send( JSON.stringify({
-          "@context":"http://lblod.data.gift/contexts/rijksregisternummer.json",
-          uri,
-          rrn: infoRequest.rrn,
-          "@type": "foaf:Person"
-        }) );
-    } else {
-      res
+    if(!vendor || !vendorKey || !rrn || !organization){
+      return res
         .status(404)
         .send( JSON.stringify({
-          "message": "You do not have access to this resource, or it does not exist.",
-          "code": 404
-        }) );
+          "message": "Invalid request",
+          "code": 400
+        }));
     }
-  } catch(e) {
+    else {
+      // fetch uri and verify access
+      const uri = await fetchPersonUri( { organization, rrn, subject, vendorKey, vendor, dataRequest } );
+
+      if( uri ) {
+        // return the response
+        res
+          .status(200)
+          .send( JSON.stringify({
+            "@context":"http://lblod.data.gift/contexts/rijksregisternummer.json",
+            uri,
+            rrn: rrn,
+            "@type": "foaf:Person"
+          }) );
+      } else {
+        res
+          .status(404)
+          .send( JSON.stringify({
+            "message": "You do not have access to this resource, or it does not exist.",
+            "code": 404
+          }) );
+      }
+    }
+  }
+  catch(e) {
     console.error(e);
     next(new Error(e.message));
   }
+
 }
 
 app.get('/', handleRequest);
