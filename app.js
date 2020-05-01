@@ -23,8 +23,9 @@ async function handleRequest( req, res, next ) {
 
     // extract triples
     const triples = await toRDF(body, {});
-    const  { organization, rrn, subject, vendorKey, vendor, dataRequest } = extractInfoFromTriples( triples );
+    let { organization, rrn, subject, vendorKey, vendor, dataRequest } = extractInfoFromTriples( triples );
 
+    //basic validation
     if(!vendor || !vendorKey || !rrn || !organization){
       return res
         .status(404)
@@ -34,6 +35,9 @@ async function handleRequest( req, res, next ) {
         }));
     }
     else {
+
+      //Strip non numeric chars from rrn.
+      rrn = rrn.replace( /[^0-9]*/g, '');
       // fetch uri and verify access
       const uri = await fetchPersonUri( { organization, rrn, subject, vendorKey, vendor, dataRequest } );
 
