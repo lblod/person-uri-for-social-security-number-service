@@ -33,18 +33,10 @@ async function handleRequest( req, res, next ) {
       res
         .status(200)
         .send( JSON.stringify({
-          "@context":{
-            "foaf": "http://xmlns.com/foaf/0.1/",
-            "adms": "http://www.w3.org/ns/adms#",
-            "rrn": "adms:identifier",
-            "uri": {
-              "@type": "@id",
-              "@id": "@id"
-            }
-          },
+          "@context":"http://lblod.data.gift/contexts/rijksregisternummer.json",
           uri,
           rrn: infoRequest.rrn,
-          "@type": "foaf:Person",
+          "@type": "foaf:Person"
         }) );
     } else {
       res
