@@ -53,19 +53,19 @@ export function extractInfoFromTriples( triples ) {
   const subject = triples
     .find( (triple) =>
            triple.subject.value == dataRequest
-           && triple.predicate.value == "http://purl.org/dc/terms/subject" )
+           && triple.predicate.value == "http://data.lblod.info/vocabularies/data-request/requestedPerson" )
     .object.value;
 
   const rrn = triples
     .find( (triple) =>
            triple.subject.value == subject
-           && triple.predicate.value == "http://www.w3.org/ns/adms#identifier" )
+           && triple.predicate.value == "http://www.w3.org/2004/02/skos/core#notation" )
     .object.value;
 
   const organization = triples
     .find( (triple) =>
            triple.subject.value == subject
-           && triple.predicate.value == "schema:memberOf" )
+           && triple.predicate.value == "http://schema.org/memberOf" )
     .object.value;
 
   return { organization, rrn, subject, vendorKey, vendor, dataRequest };
