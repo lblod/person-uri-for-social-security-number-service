@@ -91,7 +91,7 @@ export async function fetchPersonUri( info ) {
        ${personSelection}
        ${accessValidation}
      }`;
-  const results = await querySudo(query);
+  const { results } = await querySudo(query);
 
   return results.bindings.length && results.bindings[0].uri;
 }
