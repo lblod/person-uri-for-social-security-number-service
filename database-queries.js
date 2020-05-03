@@ -1,9 +1,11 @@
 import { querySudo } from '@lblod/mu-auth-sudo';
-import { sparqlEscapeUri, sparqlEscapeString } from 'mu';
+import { sparqlEscapeUri, sparqlEscapeString, sparqlEscapeInt, sparqlEscapeDateTime, sparqlEscapeBool } from 'mu';
+import _ from 'lodash';
 
 const PASSWORD_SALT = process.env.PASSWORD_SALT;
 if(!PASSWORD_SALT) throw Error('A system password salt is required.');
 
+const ACCESS_GRAPH = process.env.ACCESS_GRAPH || 'http://mu.semte.ch/graphs/ssn-access-control';
 /**
  * Queries the database in search for the URI of a person for the
  * supplied info.
@@ -99,4 +101,99 @@ export async function fetchPersonUri( info ) {
   const { results } = await querySudo(query);
 
   return results.bindings.length && results.bindings[0].uri;
+}
+
+
+export async function getFailedAttemptsData( { vendor, vendorKey } ){
+  const query = `
+    PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
+    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+    PREFIX muAccount: <http://mu.semte.ch/vocabularies/account/>
+    PREFIX acl: <http://www.w3.org/ns/auth/acl#>
+
+    SELECT DISTINCT ?account ?attempts ?lastAttemptAt
+    WHERE {
+      GRAPH ${ sparqlEscapeUri(ACCESS_GRAPH) } {
+        BIND( SHA512 (${sparqlEscapeString(vendorKey + PASSWORD_SALT)}) as ?hashedKey )
+        ${sparqlEscapeUri(vendor)} acl:member ?ssnAgent.
+        ?ssnAgent foaf:account ?account.
+        ?account muAccount:key ?hashedKey.
+
+        ?account ext:ssnFailedAttempts ?attempts.
+        ?account ext:ssnLastAttemptAt ?lastAttemptAt.
+      }
+   }
+  `;
+
+  const { results } = await querySudo(query);
+  if(results.bindings.length){
+    const result = results.bindings[0];
+    return {
+      attempts: parseInt( _.get(result, 'attempts.value')),
+      lastAttemptAt: new Date( _.get(result, 'lastAttemptAt.value'))
+    };
+  }
+  else return null;
+}
+
+export async function updateFailedAttemptsData( { vendor, vendorKey, attempts, lastAttemptAt } ) {
+  const query = `
+    PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
+    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+    PREFIX muAccount: <http://mu.semte.ch/vocabularies/account/>
+    PREFIX acl: <http://www.w3.org/ns/auth/acl#>
+
+    DELETE {
+      GRAPH ${ sparqlEscapeUri(ACCESS_GRAPH) } {
+        ?account ext:ssnFailedAttempts ?attempts.
+        ?account ext:ssnLastAttemptAt ?lastAttemptAt.
+      }
+    }
+    INSERT {
+      GRAPH ${ sparqlEscapeUri(ACCESS_GRAPH) } {
+        ?account ext:ssnFailedAttempts ${ sparqlEscapeInt(attempts)}.
+        ?account ext:ssnLastAttemptAt ${ sparqlEscapeDateTime(lastAttemptAt) }.
+      }
+    }
+    WHERE {
+      GRAPH ${ sparqlEscapeUri(ACCESS_GRAPH) } {
+        BIND( SHA512 (${sparqlEscapeString(vendorKey + PASSWORD_SALT)}) as ?hashedKey )
+        ${sparqlEscapeUri(vendor)} acl:member ?ssnAgent.
+        ?ssnAgent foaf:account ?account.
+        ?account muAccount:key ?hashedKey.
+
+        OPTIONAL { ?account ext:ssnFailedAttempts ?attempts. }
+        OPTIONAL { ?account ext:ssnLastAttemptAt ?lastAttemptAt. }
+      }
+    }
+  `;
+  await querySudo(query);
+}
+
+export async function clearFailedAttemptsData( { vendor, vendorKey } ){
+  const query = `
+    PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
+    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+    PREFIX muAccount: <http://mu.semte.ch/vocabularies/account/>
+    PREFIX acl: <http://www.w3.org/ns/auth/acl#>
+
+    DELETE {
+      GRAPH ${ sparqlEscapeUri(ACCESS_GRAPH) } {
+        ?account ext:ssnFailedAttempts ?attempts.
+        ?account ext:ssnLastAttemptAt ?lastAttemptAt.
+      }
+    }
+    WHERE {
+      GRAPH ${ sparqlEscapeUri(ACCESS_GRAPH) } {
+        BIND( SHA512 (${sparqlEscapeString(vendorKey + PASSWORD_SALT)}) as ?hashedKey )
+        ${sparqlEscapeUri(vendor)} acl:member ?ssnAgent.
+        ?ssnAgent foaf:account ?account.
+        ?account muAccount:key ?hashedKey.
+
+        OPTIONAL { ?account ext:ssnFailedAttempts ?attempts. }
+        OPTIONAL { ?account ext:ssnLastAttemptAt ?lastAttemptAt. }
+      }
+    }
+  `;
+  await querySudo(query);
 }
