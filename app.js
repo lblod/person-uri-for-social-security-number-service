@@ -2,7 +2,7 @@ import { app, query, errorHandler } from 'mu';
 import bodyParser from 'body-parser';
 import { enrichBody, extractInfoFromTriples } from './jsonld-input';
 import { fetchPersonUri } from './database-queries';
-import { hadTooManyFailedAttemptsWithinTimespan, manageFailedAttemptsData } from './security';
+import { hadTooManyFailedAttemptsWithinTimespan, manageFailedAttemptsData } from './ssn-brute-force-security';
 import { toRDF } from 'jsonld';
 import * as jsonld from 'jsonld';
 

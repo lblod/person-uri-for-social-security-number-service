@@ -1,5 +1,5 @@
 import { querySudo } from '@lblod/mu-auth-sudo';
-import { sparqlEscapeUri, sparqlEscapeString, sparqlEscapeInt, sparqlEscapeDateTime, sparqlEscapeBool } from 'mu';
+import { sparqlEscapeUri, sparqlEscapeString, sparqlEscapeInt, sparqlEscapeDateTime } from 'mu';
 import _ from 'lodash';
 
 const PASSWORD_SALT = process.env.PASSWORD_SALT;
@@ -104,7 +104,7 @@ export async function fetchPersonUri( info ) {
 }
 
 
-export async function getFailedAttemptsData( { vendor, vendorKey } ){
+export async function getFailedAttemptsDataForAccount( { vendor, vendorKey } ){
   const query = `
     PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
     PREFIX foaf: <http://xmlns.com/foaf/0.1/>
@@ -136,7 +136,7 @@ export async function getFailedAttemptsData( { vendor, vendorKey } ){
   else return null;
 }
 
-export async function updateFailedAttemptsData( { vendor, vendorKey, attempts, lastAttemptAt } ) {
+export async function updateFailedAttemptsDataForAccount( { vendor, vendorKey, attempts, lastAttemptAt } ) {
   const query = `
     PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
     PREFIX foaf: <http://xmlns.com/foaf/0.1/>
@@ -170,7 +170,7 @@ export async function updateFailedAttemptsData( { vendor, vendorKey, attempts, l
   await querySudo(query);
 }
 
-export async function clearFailedAttemptsData( { vendor, vendorKey } ){
+export async function clearFailedAttemptsDataForAccount( { vendor, vendorKey } ){
   const query = `
     PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
     PREFIX foaf: <http://xmlns.com/foaf/0.1/>
