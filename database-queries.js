@@ -1,6 +1,9 @@
 import { querySudo } from '@lblod/mu-auth-sudo';
 import { sparqlEscapeUri, sparqlEscapeString } from 'mu';
 
+const PASSWORD_SALT = process.env.PASSWORD_SALT;
+if(!PASSWORD_SALT) throw Error('A system password salt is required.');
+
 /**
  * Queries the database in search for the URI of a person for the
  * supplied info.
@@ -76,9 +79,11 @@ export async function fetchPersonUri( info ) {
 
   const accessValidation =
         `GRAPH ?accessGraph {
+
+           BIND( SHA512 (${sparqlEscapeString(info.vendorKey + PASSWORD_SALT)}) as ?hashedKey )
            ${sparqlEscapeUri(info.vendor)} acl:member ?ssnAgent.
            ?ssnAgent foaf:account ?account.
-           ?account muAccount:key ${sparqlEscapeString(info.vendorKey)}.
+           ?account muAccount:key ?hashedKey.
            ?authorization acl:agent ?ssnAgent.
            ?authorization acl:mode ${sparqlEscapeUri("http://data.lblod.info/codelists/access-modes/read")}.
            ?authorization acl:accessTo ?access.
