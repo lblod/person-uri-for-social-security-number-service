@@ -6,6 +6,7 @@ const PASSWORD_SALT = process.env.PASSWORD_SALT;
 if(!PASSWORD_SALT) throw Error('A system password salt is required.');
 
 const ACCESS_GRAPH = process.env.ACCESS_GRAPH || 'http://mu.semte.ch/graphs/ssn-access-control';
+
 /**
  * Queries the database in search for the URI of a person for the
  * supplied info.
@@ -103,8 +104,18 @@ export async function fetchPersonUri( info ) {
   return results.bindings.length && results.bindings[0].uri;
 }
 
-
-export async function getFailedAttemptsDataForAccount( { vendor, vendorKey } ){
+/**
+ * Queries the database in search for data related to a failed SSN get attempt for an account.
+ *
+ * Why an account?
+ *  - Because only accounts have access to SSN data. This is the bruteforce we want to avoid.
+ *  - We don't want to penalize all deployments of the Vendor, for one specific erratic account.
+ *
+ * @param {Object} Information object retrieved from the request, containing { vendor, vendorKey }.
+ *
+ * @return {Object} { attempts, lastAttemptAt }
+ */
+export async function getFailedSSNAttemptsDataForAccount( { vendor, vendorKey } ){
   const query = `
     PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
     PREFIX foaf: <http://xmlns.com/foaf/0.1/>
@@ -136,7 +147,13 @@ export async function getFailedAttemptsDataForAccount( { vendor, vendorKey } ){
   else return null;
 }
 
-export async function updateFailedAttemptsDataForAccount( { vendor, vendorKey, attempts, lastAttemptAt } ) {
+/**
+ * Updates the Failed SSN attempt data for an account.
+ *
+ * @param {Object} Information relevant for the updating of the failed data of an account { vendor, vendorKey, attempts, lastAttemptAt }.
+ *
+ */
+export async function updateFailedSSNAttemptsDataForAccount( { vendor, vendorKey, attempts, lastAttemptAt } ) {
   const query = `
     PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
     PREFIX foaf: <http://xmlns.com/foaf/0.1/>
@@ -170,7 +187,13 @@ export async function updateFailedAttemptsDataForAccount( { vendor, vendorKey, a
   await querySudo(query);
 }
 
-export async function clearFailedAttemptsDataForAccount( { vendor, vendorKey } ){
+/**
+ * Clears the Failed SSN attempt data for an account.
+ *
+ * @param {Object} Information relevant for the clearing the failed data of an account { vendor, vendorKey }.
+ *
+ */
+export async function clearFailedSSNAttemptsDataForAccount( { vendor, vendorKey } ){
   const query = `
     PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
     PREFIX foaf: <http://xmlns.com/foaf/0.1/>
