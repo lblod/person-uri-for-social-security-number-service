@@ -2,6 +2,7 @@ import { app, query, errorHandler } from 'mu';
 import bodyParser from 'body-parser';
 import { enrichBody, extractInfoFromTriples } from './jsonld-input';
 import { fetchPersonUri } from './database-queries';
+import { hadTooManyFailedAttemptsWithinTimespan, manageFailedAttemptsData } from './security';
 import { toRDF } from 'jsonld';
 import * as jsonld from 'jsonld';
 
@@ -28,13 +29,23 @@ async function handleRequest( req, res, next ) {
     //basic validation
     if(!vendor || !vendorKey || !rrn || !organization){
       return res
-        .status(404)
+        .status(400)
         .send( JSON.stringify({
           "message": "Invalid request",
           "code": 400
         }));
     }
+
     else {
+
+      if(await hadTooManyFailedAttemptsWithinTimespan( { vendor, vendorKey } )){
+        return res
+          .status(429)
+          .send( JSON.stringify({
+            "message": "Too many failed requests, please try again later.",
+            "code": 429
+          }));
+      }
 
       //Strip non numeric chars from rrn.
       rrn = rrn.replace( /[^0-9]*/g, '');
@@ -43,6 +54,7 @@ async function handleRequest( req, res, next ) {
 
       if( uri ) {
         // return the response
+        await manageFailedAttemptsData( { vendor, vendorKey, lastCallWasSuccess: true } );
         res
           .status(200)
           .send( JSON.stringify({
@@ -51,7 +63,9 @@ async function handleRequest( req, res, next ) {
             rrn: rrn,
             "@type": "foaf:Person"
           }) );
+
       } else {
+        await manageFailedAttemptsData( { vendor, vendorKey } );
         res
           .status(404)
           .send( JSON.stringify({
@@ -65,7 +79,6 @@ async function handleRequest( req, res, next ) {
     console.error(e);
     next(new Error(e.message));
   }
-
 }
 
 app.get('/', handleRequest);
