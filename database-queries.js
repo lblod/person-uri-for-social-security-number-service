@@ -46,39 +46,41 @@ export async function fetchPersonUri( info ) {
          PREFIX dcterms: <http://purl.org/dc/terms/>`;
 
 
-  const personSelection =
-        `  {
-              SELECT DISTINCT ?uri WHERE {
-                GRAPH ?public {
-                  ?bestuursorgaan besluit:bestuurt ${sparqlEscapeUri(info.organization)}.
-                  ?bestuursorgaanInTijd mandaat:isTijdspecialisatieVan ?bestuursorgaan.
+  const personMandatarisSelection =
+        `GRAPH ?public {
+           ?bestuursorgaan besluit:bestuurt ${sparqlEscapeUri(info.organization)}.
+           ?bestuursorgaanInTijd mandaat:isTijdspecialisatieVan ?bestuursorgaan.
 
-                  OPTIONAL {
-                    ?bestuursorgaanInTijd lblodlg:heeftBestuursfunctie ?bestuursfunctie.
-                  }
+           ?verkiezing mandaat:steltSamen ?bestuursorgaanInTijd.
+           ?kandidatenlijst mandaat:behoortTot ?verkiezing.
+           ?kandidatenlijst mandaat:heeftKandidaat ?uri.
+         }
 
-                  OPTIONAL {
-                    ?verkiezing mandaat:steltSamen ?bestuursorgaanInTijd.
-                    ?kandidatenlijst mandaat:behoortTot ?verkiezing.
-                    ?kandidatenlijst mandaat:heeftKandidaat ?uri.
-                  }
-                }
+         GRAPH ?loketGraph {
+           ?uri a person:Person;
+             adms:identifier ?identifier.
+           ?identifier skos:notation ${sparqlEscapeString(info.rrn)}.
+         }`;
 
-                GRAPH ?loketGraph {
-                  OPTIONAL {
-                    ?functionaris org:holds ?bestuursfunctie.
-                    ?functionaris mandaat:isBestuurlijkeAliasVan ?uri.
-                  }
-                }
 
-              }
-            }
+  const personLeidinggevendeSelection =
+        `GRAPH ?public {
+           ?bestuursorgaan besluit:bestuurt ${sparqlEscapeUri(info.organization)}.
+           ?bestuursorgaanInTijd mandaat:isTijdspecialisatieVan ?bestuursorgaan.
 
-            GRAPH ?loketGraph {
-              ?uri a person:Person;
-              adms:identifier ?identifier.
-              ?identifier skos:notation ${sparqlEscapeString(info.rrn)}.
-            }`;
+           ?bestuursorgaanInTijd lblodlg:heeftBestuursfunctie ?bestuursfunctie.
+         }
+
+         GRAPH ?loketGraph {
+           ?functionaris org:holds ?bestuursfunctie.
+           ?functionaris mandaat:isBestuurlijkeAliasVan ?uri.
+         }
+
+         GRAPH ?loketGraph {
+           ?uri a person:Person;
+             adms:identifier ?identifier.
+           ?identifier skos:notation ${sparqlEscapeString(info.rrn)}.
+         }`;
 
   const accessValidation =
         `GRAPH ?accessGraph {
@@ -93,15 +95,29 @@ export async function fetchPersonUri( info ) {
            ?access dcterms:subject ${sparqlEscapeUri(info.organization)}.
          }`;
 
-  const query = `
+  const queryPersonMandatarisSelection = `
       ${prefixes}
       SELECT DISTINCT ?uri WHERE {
-       ${personSelection}
+       ${personMandatarisSelection}
        ${accessValidation}
      }`;
-  const { results } = await querySudo(query);
 
-  return results.bindings.length && results.bindings[0].uri;
+  const queryPersonLeidinggevendeSelection = `
+      ${prefixes}
+      SELECT DISTINCT ?uri WHERE {
+       ${personLeidinggevendeSelection}
+       ${accessValidation}
+     }`;
+
+  let { results } = await querySudo(queryPersonMandatarisSelection);
+
+  if(results.bindings.length && results.bindings[0].uri){
+    return results.bindings[0].uri;
+  }
+  else {
+    let { results } = await querySudo(queryPersonLeidinggevendeSelection);
+    return results.bindings.length && results.bindings[0].uri;
+  }
 }
 
 /**
