@@ -66,6 +66,12 @@ Notes:
 
 ## Model
 ### Request model
-TODO
+See [https://lblod.data.gift/vocabularies/ssn-request](https://lblod.data.gift/vocabularies/ssn-request).
+
+Or with a nice visualisaton:
+[http://visualdataweb.de/webvowl/#iri=https://lblod.data.gift/vocabularies/ssn-request](http://visualdataweb.de/webvowl/#iri=https://lblod.data.gift/vocabularies/ssn-request)
 ### ACL model
-TODO
+See [https://lblod.data.gift/vocabularies/ssn-acl](https://lblod.data.gift/vocabularies/ssn-acl).
+
+Or with a nice visualisaton:
+[http://visualdataweb.de/webvowl/#iri=https://lblod.data.gift/vocabularies/ssn-acl](http://visualdataweb.de/webvowl/#iri=https://lblod.data.gift/vocabularies/ssn-acl)
