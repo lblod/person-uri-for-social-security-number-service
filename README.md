@@ -55,10 +55,7 @@ Notes:
 ```
 {
     "@context": "http://lblod.data.gift/contexts/rijksregisternummer-api/context.json",
-    "uri": {
-        "value": "http://data.lblod.info/id/personen/3c30d9ed-eeb0-4ab2-904c-12758330dfbe",
-        "type": "uri"
-    },
+    "uri":"http://data.lblod.info/id/personen/3c30d9ed-eeb0-4ab2-904c-12758330dfbe",
     "rrn": "12345678912",
     "@type": "foaf:Person"
 }

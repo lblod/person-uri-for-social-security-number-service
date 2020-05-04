@@ -59,7 +59,7 @@ async function handleRequest( req, res, next ) {
           .status(200)
           .send( JSON.stringify({
             "@context": "http://lblod.data.gift/contexts/rijksregisternummer-api/context.json",
-            uri,
+            uri: uri.value,
             rrn: rrn,
             "@type": "foaf:Person"
           }) );
