@@ -62,6 +62,23 @@ export async function fetchPersonUri( info ) {
            ?identifier skos:notation ${sparqlEscapeString(info.rrn)}.
          }`;
 
+  // mandatarissen in loket with new created persons are not added to a kieslijst
+  const personMandatarisSelection =
+        `GRAPH ?public {
+           ?bestuursorgaan besluit:bestuurt ${sparqlEscapeUri(info.organization)}.
+           ?bestuursorgaanInTijd mandaat:isTijdspecialisatieVan ?bestuursorgaan.
+
+           ?bestuursorgaanInTijd org:hasPost ?mandaat.
+           ?mandataris org:holds ?mandaat.
+           ?mandataris mandaat:isBestuurlijkeAliasVan ?uri.
+         }
+
+         GRAPH ?loketGraph {
+           ?uri a person:Person;
+             adms:identifier ?identifier.
+           ?identifier skos:notation ${sparqlEscapeString(info.rrn)}.
+         }`;
+
 
   const personLeidinggevendeSelection =
         `GRAPH ?public {
