@@ -58,7 +58,7 @@ async function handleRequest( req, res, next ) {
         res
           .status(200)
           .send( JSON.stringify({
-            "@context":"http://lblod.data.gift/contexts/rijksregisternummer.json",
+            "@context": "http://lblod.data.gift/contexts/rijksregisternummer-api/context.json",
             uri,
             rrn: rrn,
             "@type": "foaf:Person"
