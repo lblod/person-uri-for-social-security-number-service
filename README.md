@@ -13,8 +13,8 @@ Add the following snippet to your `docker-compose.yml`:
 The following environment variables are availible:
  - `PASSWORD_SALT`: a system wide salt to generate correct hashes of the keys [REQUIRED]
  - `ACCESS_GRAPH`: the graph where account data of vendors are stored, defaults to `http://mu.semte.ch/graphs/ssn-access-control`
- - `MAX_CONSECUTIVE_FAILED_ATTEMPTS`: To avoid brute force SSN deduction, the agent is allowed a max amount of failed attempts, before a delay mechanism occurs. Defaults to 1000.
- - `WAIT_BETWEEN_MAX_CONSECUTIVE_FAILED_ATTEMPTS`: The length of the delay time. Defaults to 30 seconds.
+ - `MAX_CONSECUTIVE_ATTEMPTS_WITHIN_TIMESPAN`: To avoid brute force SSN deduction, the agent is allowed a max amount of attempts within a timespan.
+ - `MAX_CONSECUTIVE_ATTEMPTS_TIMESPAN`: The length of the timespan. Defaults to 30 seconds.
 
 Configure the dispatcher by adding the following rule:
 ```

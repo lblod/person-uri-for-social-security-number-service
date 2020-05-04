@@ -2,7 +2,7 @@ import { app, query, errorHandler } from 'mu';
 import bodyParser from 'body-parser';
 import { enrichBody, extractInfoFromTriples } from './jsonld-input';
 import { fetchPersonUri } from './database-queries';
-import { hadTooManyFailedAttemptsWithinTimespan, manageFailedAttemptsData } from './ssn-brute-force-security';
+import { hadTooManyAttemptsWithinTimespan, manageAttemptsData } from './ssn-brute-force-security';
 import { toRDF } from 'jsonld';
 import * as jsonld from 'jsonld';
 
@@ -38,7 +38,7 @@ async function handleRequest( req, res, next ) {
 
     else {
 
-      if(await hadTooManyFailedAttemptsWithinTimespan( { vendor, vendorKey } )){
+      if(await hadTooManyAttemptsWithinTimespan( { vendor, vendorKey } )){
         return res
           .status(429)
           .send( JSON.stringify({
@@ -54,7 +54,7 @@ async function handleRequest( req, res, next ) {
 
       if( uri ) {
         // return the response
-        await manageFailedAttemptsData( { vendor, vendorKey, lastCallWasSuccess: true } );
+        await manageAttemptsData( { vendor, vendorKey } );
         res
           .status(200)
           .send( JSON.stringify({
@@ -65,7 +65,7 @@ async function handleRequest( req, res, next ) {
           }) );
 
       } else {
-        await manageFailedAttemptsData( { vendor, vendorKey } );
+        await manageAttemptsData( { vendor, vendorKey } );
         res
           .status(404)
           .send( JSON.stringify({

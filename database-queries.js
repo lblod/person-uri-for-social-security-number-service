@@ -133,7 +133,7 @@ function buildPersonQueryString(prefixes, accessValidation, personSelection){
 }
 
 /**
- * Queries the database in search for data related to a failed SSN get attempt for an account.
+ * Queries the database in search for data related to an SSN get attempt for an account.
  *
  * Why an account?
  *  - Because only accounts have access to SSN data. This is the bruteforce we want to avoid.
@@ -143,7 +143,7 @@ function buildPersonQueryString(prefixes, accessValidation, personSelection){
  *
  * @return {Object} { attempts, lastAttemptAt }
  */
-export async function getFailedSSNAttemptsDataForAccount( { vendor, vendorKey } ){
+export async function getSSNAttemptsDataForAccount( { vendor, vendorKey } ){
   const query = `
     PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
     PREFIX foaf: <http://xmlns.com/foaf/0.1/>
@@ -158,7 +158,7 @@ export async function getFailedSSNAttemptsDataForAccount( { vendor, vendorKey } 
         ?ssnAgent foaf:account ?account.
         ?account muAccount:key ?hashedKey.
 
-        ?account ext:ssnFailedAttempts ?attempts.
+        ?account ext:ssnAttempts ?attempts.
         ?account ext:ssnLastAttemptAt ?lastAttemptAt.
       }
    }
@@ -176,12 +176,12 @@ export async function getFailedSSNAttemptsDataForAccount( { vendor, vendorKey } 
 }
 
 /**
- * Updates the Failed SSN attempt data for an account.
+ * Updates the  SSN attempt data for an account.
  *
- * @param {Object} Information relevant for the updating of the failed data of an account { vendor, vendorKey, attempts, lastAttemptAt }.
+ * @param {Object} Information relevant for the updating of the  data of an account { vendor, vendorKey, attempts, lastAttemptAt }.
  *
  */
-export async function updateFailedSSNAttemptsDataForAccount( { vendor, vendorKey, attempts, lastAttemptAt } ) {
+export async function updateSSNAttemptsDataForAccount( { vendor, vendorKey, attempts, lastAttemptAt } ) {
   const query = `
     PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
     PREFIX foaf: <http://xmlns.com/foaf/0.1/>
@@ -190,13 +190,13 @@ export async function updateFailedSSNAttemptsDataForAccount( { vendor, vendorKey
 
     DELETE {
       GRAPH ${ sparqlEscapeUri(ACCESS_GRAPH) } {
-        ?account ext:ssnFailedAttempts ?attempts.
+        ?account ext:ssnAttempts ?attempts.
         ?account ext:ssnLastAttemptAt ?lastAttemptAt.
       }
     }
     INSERT {
       GRAPH ${ sparqlEscapeUri(ACCESS_GRAPH) } {
-        ?account ext:ssnFailedAttempts ${ sparqlEscapeInt(attempts)}.
+        ?account ext:ssnAttempts ${ sparqlEscapeInt(attempts)}.
         ?account ext:ssnLastAttemptAt ${ sparqlEscapeDateTime(lastAttemptAt) }.
       }
     }
@@ -207,7 +207,7 @@ export async function updateFailedSSNAttemptsDataForAccount( { vendor, vendorKey
         ?ssnAgent foaf:account ?account.
         ?account muAccount:key ?hashedKey.
 
-        OPTIONAL { ?account ext:ssnFailedAttempts ?attempts. }
+        OPTIONAL { ?account ext:ssnAttempts ?attempts. }
         OPTIONAL { ?account ext:ssnLastAttemptAt ?lastAttemptAt. }
       }
     }
@@ -216,12 +216,12 @@ export async function updateFailedSSNAttemptsDataForAccount( { vendor, vendorKey
 }
 
 /**
- * Clears the Failed SSN attempt data for an account.
+ * Clears the SSN attempt data for an account.
  *
- * @param {Object} Information relevant for the clearing the failed data of an account { vendor, vendorKey }.
+ * @param {Object} Information relevant for the clearing the  data of an account { vendor, vendorKey }.
  *
  */
-export async function clearFailedSSNAttemptsDataForAccount( { vendor, vendorKey } ){
+export async function clearSSNAttemptsDataForAccount( { vendor, vendorKey } ){
   const query = `
     PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
     PREFIX foaf: <http://xmlns.com/foaf/0.1/>
@@ -230,7 +230,7 @@ export async function clearFailedSSNAttemptsDataForAccount( { vendor, vendorKey 
 
     DELETE {
       GRAPH ${ sparqlEscapeUri(ACCESS_GRAPH) } {
-        ?account ext:ssnFailedAttempts ?attempts.
+        ?account ext:ssnAttempts ?attempts.
         ?account ext:ssnLastAttemptAt ?lastAttemptAt.
       }
     }
@@ -241,7 +241,7 @@ export async function clearFailedSSNAttemptsDataForAccount( { vendor, vendorKey 
         ?ssnAgent foaf:account ?account.
         ?account muAccount:key ?hashedKey.
 
-        OPTIONAL { ?account ext:ssnFailedAttempts ?attempts. }
+        OPTIONAL { ?account ext:ssnAttempts ?attempts. }
         OPTIONAL { ?account ext:ssnLastAttemptAt ?lastAttemptAt. }
       }
     }
