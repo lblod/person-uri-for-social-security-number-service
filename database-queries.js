@@ -45,8 +45,7 @@ export async function fetchPersonUri( info ) {
          PREFIX muAccount: <http://mu.semte.ch/vocabularies/account/>
          PREFIX dcterms: <http://purl.org/dc/terms/>`;
 
-
-  const personMandatarisSelection =
+  const personKieslijstSelection =
         `GRAPH ?public {
            ?bestuursorgaan besluit:bestuurt ${sparqlEscapeUri(info.organization)}.
            ?bestuursorgaanInTijd mandaat:isTijdspecialisatieVan ?bestuursorgaan.
@@ -112,29 +111,25 @@ export async function fetchPersonUri( info ) {
            ?access dcterms:subject ${sparqlEscapeUri(info.organization)}.
          }`;
 
-  const queryPersonMandatarisSelection = `
+
+  const potentialPathsToPersons = [ personKieslijstSelection, personMandatarisSelection, personLeidinggevendeSelection ];
+
+  for(const pathToPerson of potentialPathsToPersons){
+    let { results } = await querySudo(buildPersonQueryString(prefixes, accessValidation, pathToPerson));
+    if(results.bindings.length && results.bindings[0].uri){
+      return results.bindings[0].uri;
+    }
+  }
+  return null;
+}
+
+function buildPersonQueryString(prefixes, accessValidation, personSelection){
+  return `
       ${prefixes}
       SELECT DISTINCT ?uri WHERE {
-       ${personMandatarisSelection}
+       ${personSelection}
        ${accessValidation}
      }`;
-
-  const queryPersonLeidinggevendeSelection = `
-      ${prefixes}
-      SELECT DISTINCT ?uri WHERE {
-       ${personLeidinggevendeSelection}
-       ${accessValidation}
-     }`;
-
-  let { results } = await querySudo(queryPersonMandatarisSelection);
-
-  if(results.bindings.length && results.bindings[0].uri){
-    return results.bindings[0].uri;
-  }
-  else {
-    let { results } = await querySudo(queryPersonLeidinggevendeSelection);
-    return results.bindings.length && results.bindings[0].uri;
-  }
 }
 
 /**
