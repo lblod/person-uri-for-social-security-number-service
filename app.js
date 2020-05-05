@@ -60,7 +60,7 @@ async function handleRequest( req, res, next ) {
           .send( JSON.stringify({
             "@context": "http://lblod.data.gift/contexts/rijksregisternummer-api/context.json",
             uri: uri.value,
-            rrn: rrn,
+            rrn: formatRRN(rrn),
             "@type": "foaf:Person"
           }) );
 
@@ -79,6 +79,11 @@ async function handleRequest( req, res, next ) {
     console.error(e);
     next(new Error(e.message));
   }
+}
+
+function formatRRN(rrn){
+  rrn = rrn.replace( /[^0-9]*/g, '');
+  return `${rrn.slice(0, 2)}.${rrn.slice(2, 4)}.${rrn.slice(4, 6)}-${rrn.slice(6, 9)}.${rrn.slice(9, 11)}`;
 }
 
 app.get('/', handleRequest);
