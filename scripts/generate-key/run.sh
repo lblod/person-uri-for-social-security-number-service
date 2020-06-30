@@ -52,7 +52,7 @@ INSERT {
 }"
 
 TIMESTAMP=`date "+%Y%m%d%H%M%S"`
-FILENAME=$TIMESTAMP"-generate-key.sparql"
+FILENAME=$TIMESTAMP"-generate-key-sensitive.sparql"
 
 echo "Creating migration with name $FILENAME"
 mkdir -p /data/app/config/migrations/
