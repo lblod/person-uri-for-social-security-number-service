@@ -1,6 +1,6 @@
 #!/bin/bash
 if [ "$#" -ne 4 ]; then
-  echo "The number of parameters is not correct. You need to provide the following: ./rush.sh VENDOR_URI BESTUURSEENHEID_URI key PASSWORD_SALT"
+  echo "The number of parameters is not correct. You need to provide the following: ./run.sh vendorUri bestuurseenheidUri key passwordSalt"
   exit 1
 fi
 
@@ -13,14 +13,7 @@ ACCOUNT_UUID=$(cat /proc/sys/kernel/random/uuid)
 ACLS_UUID=$(cat /proc/sys/kernel/random/uuid)
 INFORMATION_RESOURCE_UUID=$(cat /proc/sys/kernel/random/uuid)
 
-QUERY="PREFIX mandaat: <http://data.vlaanderen.be/ns/mandaat#>
-PREFIX besluit: <http://data.vlaanderen.be/ns/besluit#>
-PREFIX rrn: <http://data.lblod.info/vocabularies/rrn/>
-PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-PREFIX adms: <http://www.w3.org/ns/adms#>
-PREFIX person: <http://www.w3.org/ns/person#>
-PREFIX lblodlg: <http://data.lblod.info/vocabularies/leidinggevenden/>
-PREFIX org: <http://www.w3.org/ns/org#>
+QUERY="PREFIX org: <http://www.w3.org/ns/org#>
 PREFIX acl: <http://www.w3.org/ns/auth/acl#>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX muAccount: <http://mu.semte.ch/vocabularies/account/>
