@@ -15,6 +15,22 @@
       "mounts": {
         "app": "/data/app/"
       }
+    },
+    {
+      "documentation": {
+        "command": "create-mandatarissen",
+        "description": "Create a few mandatarissen for a bestuurseenheid",
+        "arguments": []
+      },
+      "environment": {
+        "image": "everpeace/curl-jq",
+        "interactive": false,
+        "join_networks": true,
+        "script": "create-mandatarissen/run.sh"
+      },
+      "mounts": {
+        "app": "/data/app/"
+      }
     }
   ]
 }
