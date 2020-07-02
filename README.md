@@ -72,3 +72,23 @@ See [https://lblod.data.gift/vocabularies/ssn-acl](https://lblod.data.gift/vocab
 
 Or with a nice visualisaton:
 [http://visualdataweb.de/webvowl/#iri=https://lblod.data.gift/vocabularies/ssn-acl](http://visualdataweb.de/webvowl/#iri=https://lblod.data.gift/vocabularies/ssn-acl)
+
+## Scripts
+
+The service offers scripts to create migrations.
+
+### Generate key
+
+Generate a key for a pair of bestuurseenheid and vendor.
+
+```
+mu script person-uri-for-social-security-number generate-key <vendorUri> <bestuurseenheidUri> <key> <passwordSalt>
+```
+
+### Create mandatarissen
+
+For a given bestuurseenheid, create a mock mandataris and a mock functionaris if respectively a mandate and a bestuursfunctie are found.
+
+```
+mu script person-uri-for-social-security-number create-mandatarissen <bestuurseenheidUri>
+```

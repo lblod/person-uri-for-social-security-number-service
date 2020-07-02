@@ -19,7 +19,7 @@
     {
       "documentation": {
         "command": "create-mandatarissen",
-        "description": "Create a few mandatarissen for a bestuurseenheid",
+        "description": "For a given bestuurseenheid, create a mock mandataris and a mock functionaris if respectively a mandate and a bestuursfunctie are found.",
         "arguments": []
       },
       "environment": {
