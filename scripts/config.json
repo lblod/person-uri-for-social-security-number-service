@@ -1,0 +1,36 @@
+{
+  "version": "0.1",
+  "scripts": [
+    {
+      "documentation": {
+        "command": "generate-key",
+        "description": "Generate a key for a pair of bestuurseenheid and vendor",
+        "arguments": ["vendorUri", "besuurseenheidUri", "key", "passwordSalt"]
+      },
+      "environment": {
+        "image": "ubuntu",
+        "interactive": false,
+        "script": "generate-key/run.sh"
+      },
+      "mounts": {
+        "app": "/data/app/"
+      }
+    },
+    {
+      "documentation": {
+        "command": "create-mandatarissen",
+        "description": "For a given bestuurseenheid, create a mock mandataris and a mock functionaris if respectively a mandate and a bestuursfunctie are found.",
+        "arguments": []
+      },
+      "environment": {
+        "image": "everpeace/curl-jq",
+        "interactive": false,
+        "join_networks": true,
+        "script": "create-mandatarissen/run.sh"
+      },
+      "mounts": {
+        "app": "/data/app/"
+      }
+    }
+  ]
+}
