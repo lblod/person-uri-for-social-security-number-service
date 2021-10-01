@@ -68,7 +68,7 @@ async function handleRequest( req, res, next ) {
 
     //Check account integrity
     if(accountData.length > 1){
-      //For a pair of key en vendor uri (or acm token) we expect only one account
+      //For a pair of (key/vendorUri) OR (vendorUri working with ACM/IDM token) we expect only one account
       throw `Multiple accounts found for ${vendor}`;
     }
 
