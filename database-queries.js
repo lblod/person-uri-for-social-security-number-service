@@ -150,15 +150,7 @@ export async function getSSNAttemptsDataForAccount( { vendor, vendorKey } ){
    }
   `;
 
-  const { results } = await querySudo(query);
-  if(results.bindings.length){
-    const result = results.bindings[0];
-    return {
-      attempts: parseInt( _.get(result, 'attempts.value')),
-      lastAttemptAt: new Date( _.get(result, 'lastAttemptAt.value'))
-    };
-  }
-  else return null;
+  return parseResult(await querySudo(query))[0];
 }
 
 /**
