@@ -2,6 +2,7 @@ import { querySudo } from '@lblod/mu-auth-sudo';
 import _ from 'lodash';
 import { sparqlEscapeDateTime, sparqlEscapeInt, sparqlEscapeString, sparqlEscapeUri } from 'mu';
 import { PREFIXES } from './constants';
+import { parseResult } from './utils';
 
 const PASSWORD_SALT = process.env.PASSWORD_SALT;
 if(!PASSWORD_SALT) throw Error('A system password salt is required.');
@@ -104,9 +105,9 @@ export async function fetchPersonUri( info ) {
   const potentialPathsToPersons = [ personKieslijstSelection, personMandatarisSelection, personLeidinggevendeSelection ];
 
   for(const pathToPerson of potentialPathsToPersons){
-    let { results } = await querySudo(buildPersonQueryString(prefixes, accessValidation, pathToPerson));
-    if(results.bindings.length && results.bindings[0].uri){
-      return results.bindings[0].uri;
+    let rrnData = parseResult(await querySudo(buildPersonQueryString(prefixes, accessValidation, pathToPerson)));
+    if(rrnData.length && rrnData[0].uri){
+      return rrnData.uri;
     }
   }
   return null;
