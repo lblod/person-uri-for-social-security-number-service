@@ -85,6 +85,11 @@ See [https://lblod.data.gift/vocabularies/ssn-request](https://lblod.data.gift/v
 ### ACL model
 See [https://lblod.data.gift/vocabularies/ssn-acl](https://lblod.data.gift/vocabularies/ssn-acl).
 
+#### Notes
+
+The scope of `muAccount:SSNAccess` is imited to data within a bestuurseenheid
+The scope of `muAccount:SuperSSNAccess` is limited to a class type, currently supported `mandaat:Mandataris` and `lblodlg:Functionaris`
+
 ## Scripts
 
 The service offers scripts to create migrations.
