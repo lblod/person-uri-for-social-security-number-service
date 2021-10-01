@@ -1,14 +1,14 @@
 import bodyParser from 'body-parser';
 import { toRDF } from 'jsonld';
+import _ from 'lodash';
 import { app, errorHandler } from 'mu';
 import { AGGREGATED_SSN_ACCESS_TYPE, SSN_ACCESS_TYPE } from './constants';
-import {
-    fetchPersonUriAggregatedSSNAccess, fetchPersonUriRegularSSNAccess, getAccessResourceData,
-    getAccountData
-} from './database-queries';
+import { fetchPersonUriRegularSSNAccess,
+         fetchPersonUriAggregatedSSNAccess,
+         getAccessResourceData,
+         getAccountData } from './database-queries';
 import { enrichBody, extractInfoFromTriples } from './jsonld-input';
 import { hadTooManyAttemptsWithinTimespan, manageAttemptsData } from './ssn-brute-force-security';
-
 
 app.use(errorHandler);
 app.use(bodyParser.json({ type: 'application/ld+json'}));
@@ -39,7 +39,7 @@ async function handleRequest( req, res, next ) {
     let { organization, rrn, subject, vendorKey, vendor, dataRequest } = extractInfoFromTriples( triples );
 
     //basic validation
-    if(!vendor || !vendorKey || !rrn || !organization){
+    if(!vendor || !vendorKey || !rrn ){
       res
         .status(400)
         .send( JSON.stringify({

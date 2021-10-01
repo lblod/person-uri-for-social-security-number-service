@@ -193,6 +193,8 @@ export async function fetchPersonUriAggregatedSSNAccess( info ){
     const personData = parseResult(await querySudo(selectLeidinggevendePersonQuery))[0];
     uri = personData ? personData.uri : null;
   }
+
+  return uri;
 }
 
 /**
