@@ -82,7 +82,7 @@ export async function getAccessResourceData(account){
  * WARNING: expects authentication and authorization being ok.
  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  *
- * TODO: use function decoractors to ensure authentication preconditions
+ * TODO: use function decorators to ensure authentication preconditions
  *       are fulfilled. (To avoid accidental mis-use)
  *
  * Queries the database in search for the URI of a person for the
@@ -201,7 +201,7 @@ export async function fetchPersonUriAggregatedSSNAccess( info ){
  * WARNING: expects authentication and authorization being ok.
  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  *
- * TODO: use function decoractors to ensure authentication preconditions
+ * TODO: use function decorators to ensure authentication preconditions
  *       are fulfilled. (To avoid accidental mis-use)
  *
  * Queries the database in search for the URI of a person for the
