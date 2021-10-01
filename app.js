@@ -67,7 +67,7 @@ async function handleRequest( req, res, next ) {
     }
 
     //Check account integrity
-    if(accountData.length > 1 ){
+    if(accountData.length > 1){
       //For a pair of key en vendor uri (or acm token) we expect only one account
       throw `Multiple accounts found for ${vendor}`;
     }
@@ -117,7 +117,7 @@ async function handleRequest( req, res, next ) {
     }
 
     else if(accessResourceType == SSN_ACCESS_TYPE){
-      uri = await fetchPersonUriRegularSSNAccess( { organization, rrn, subject, account} );
+      uri = await fetchPersonUriRegularSSNAccess( { organization, rrn, subject, account } );
     }
 
     else{
