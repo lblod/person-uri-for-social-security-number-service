@@ -1,6 +1,6 @@
 import { querySudo } from '@lblod/mu-auth-sudo';
-import { sparqlEscapeUri, sparqlEscapeString, sparqlEscapeInt, sparqlEscapeDateTime } from 'mu';
 import _ from 'lodash';
+import { sparqlEscapeDateTime, sparqlEscapeInt, sparqlEscapeString, sparqlEscapeUri } from 'mu';
 import { PREFIXES } from './constants';
 
 const PASSWORD_SALT = process.env.PASSWORD_SALT;

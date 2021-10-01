@@ -1,6 +1,7 @@
-import { getSSNAttemptsDataForAccount,
-         updateSSNAttemptsDataForAccount,
-         clearSSNAttemptsDataForAccount } from './database-queries';
+import {
+    clearSSNAttemptsDataForAccount, getSSNAttemptsDataForAccount,
+    updateSSNAttemptsDataForAccount
+} from './database-queries';
 
 const MAX_CONSECUTIVE_ATTEMPTS = parseInt( process.env.MAX_CONSECUTIVE_ATTEMPTS_WITHIN_TIMESPAN || 1000 );
 const WAIT_BETWEEN_MAX_CONSECUTIVE_ATTEMPTS = parseInt( process.env.MAX_CONSECUTIVE_ATTEMPTS_TIMESPAN || 30000 );

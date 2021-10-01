@@ -1,10 +1,9 @@
-import { app, query, errorHandler } from 'mu';
 import bodyParser from 'body-parser';
-import { enrichBody, extractInfoFromTriples } from './jsonld-input';
-import { fetchPersonUri } from './database-queries';
-import { hadTooManyAttemptsWithinTimespan, manageAttemptsData } from './ssn-brute-force-security';
 import { toRDF } from 'jsonld';
-import * as jsonld from 'jsonld';
+import { app, errorHandler } from 'mu';
+import { fetchPersonUri } from './database-queries';
+import { enrichBody, extractInfoFromTriples } from './jsonld-input';
+import { hadTooManyAttemptsWithinTimespan, manageAttemptsData } from './ssn-brute-force-security';
 
 app.use(errorHandler);
 app.use(bodyParser.json({ type: 'application/ld+json'}));
