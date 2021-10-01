@@ -18,7 +18,9 @@ app.use(bodyParser.json());
  * Handles the request, regardless of it coming from get or post.
  */
 async function handleRequest( req, res, next ) {
+
   try {
+
     const validContentType = /application\/(ld\+)?json/.test(req.get('content-type'));
 
     if (!validContentType) {
@@ -31,14 +33,14 @@ async function handleRequest( req, res, next ) {
       return;
     }
 
+    //Extract triples
     const body = req.body;
     enrichBody(body);
 
-    // extract triples
     const triples = await toRDF(body, {});
     let { organization, rrn, subject, vendorKey, vendor, dataRequest } = extractInfoFromTriples( triples );
 
-    //basic validation
+    //Basic body validation
     if(!vendor || !vendorKey || !rrn ){
       res
         .status(400)
@@ -104,11 +106,11 @@ async function handleRequest( req, res, next ) {
       throw `Multiple AccessResourceTypes for ${account} were found, only one is supported`;
     }
 
+    const accessResourceType = accessResourceTypes[0];
+
     //Strip non numeric chars from rrn.
     rrn = rrn.replace( /[^0-9]*/g, '');
     let uri = null;
-
-    const accessResourceType = accessResourceTypes[0];
 
     if(accessResourceType == AGGREGATED_SSN_ACCESS_TYPE){
       uri = await fetchPersonUriAggregatedSSNAccess( { rrn, account, accessResourceData } );
