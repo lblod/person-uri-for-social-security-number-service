@@ -1,9 +1,14 @@
 import bodyParser from 'body-parser';
 import { toRDF } from 'jsonld';
 import { app, errorHandler } from 'mu';
-import { fetchPersonUri, getAccountData, getAccessResourceData } from './database-queries';
+import { AGGREGATED_SSN_ACCESS_TYPE, SSN_ACCESS_TYPE } from './constants';
+import {
+    fetchPersonUriAggregatedSSNAccess, fetchPersonUriRegularSSNAccess, getAccessResourceData,
+    getAccountData
+} from './database-queries';
 import { enrichBody, extractInfoFromTriples } from './jsonld-input';
 import { hadTooManyAttemptsWithinTimespan, manageAttemptsData } from './ssn-brute-force-security';
+
 
 app.use(errorHandler);
 app.use(bodyParser.json({ type: 'application/ld+json'}));
@@ -101,10 +106,23 @@ async function handleRequest( req, res, next ) {
 
     //Strip non numeric chars from rrn.
     rrn = rrn.replace( /[^0-9]*/g, '');
-    // fetch uri and verify access
-    const uri = await fetchPersonUri( { organization, rrn, subject, account } );
+    let uri = null;
 
-    if( uri ) {
+    const accessResourceType = accessResourceTypes[0];
+
+    if(accessResourceType == AGGREGATED_SSN_ACCESS_TYPE){
+      uri = await fetchPersonUriAggregatedSSNAccess( { rrn, account, accessResourceData } );
+    }
+
+    else if(accessResourceType == SSN_ACCESS_TYPE){
+      uri = await fetchPersonUriRegularSSNAccess( { organization, rrn, subject, account} );
+    }
+
+    else{
+      throw `Unsupported accessResourceType: ${accessResourceType}`;
+    }
+
+    if(uri){
       res
         .status(200)
         .send( JSON.stringify({
@@ -114,6 +132,7 @@ async function handleRequest( req, res, next ) {
           "@type": "foaf:Person"
         }) );
     }
+
     else {
       res
         .status(404)

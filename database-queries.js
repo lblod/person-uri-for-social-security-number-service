@@ -91,6 +91,123 @@ export async function getAccessResourceData(account){
  *
  * @param info {Object} Information object retrieved from the request.
  *
+ * @param info.rrn {string} Request information containing identifier
+ * of the person (Social security number or Rijksregisternummer) as a
+ * string.
+ *
+ * @param info.account {string} Uri of the account asking for the data
+ *
+ * @param info.accessResourceData {Object} Information regarding the subject
+ *  the account is entitled to. (in casu mandaat:Manadatarissen, lblodlg:Functionaris)
+ *
+ * @return The URI of the person in string format, or null if no
+ * person matched the supplied conditions (including access rights).
+ */
+export async function fetchPersonUriAggregatedSSNAccess( info ){
+  const { account, rrn, accessResourceData } = info;
+  const accesResourceSubjects = accessResourceData.map( acl => acl.accessResourceSubject );
+
+  let uri = null;
+
+  const accessResourceSubjectValidation =
+        `GRAPH ?accessGraph {
+           ?account a foaf:OnlineAccount.
+           ?ssnAgent a muAccount:SSNAgent;
+             foaf:account ?account.
+
+           ?acl a acl:Authorization;
+              acl:mode ${sparqlEscapeUri("http://data.lblod.info/codelists/access-modes/read")};
+              acl:agent ?ssnAgent;
+              acl:accessTo ?accessResource.
+
+            ?accessResource a muAccount:AggregatedSSNAccess;
+              dcterms:subject ?accessResourceSubject.
+         }`;
+
+  if( accesResourceSubjects.includes('http://data.vlaanderen.be/ns/mandaat#Mandataris') ){
+    const personMandatarisSelection =
+          `GRAPH ?public {
+             ?bestuurseenheid a besluit:Bestuurseenheid.
+             ?bestuursorgaan besluit:bestuurt ?bestuurseenheid.
+             ?bestuursorgaanInTijd mandaat:isTijdspecialisatieVan ?bestuursorgaan.
+             ?bestuursorgaanInTijd org:hasPost ?mandaat.
+           }
+
+           GRAPH ?loketGraph {
+             ?mandataris a ?accessResourceSubject.
+             ?mandataris org:holds ?mandaat.
+             ?mandataris mandaat:isBestuurlijkeAliasVan ?uri.
+             ?uri a person:Person;
+               adms:identifier ?identifier.
+             ?identifier skos:notation ${sparqlEscapeString(rrn)}.
+           }
+          `;
+
+    const selectPoliticalMandatePersonQuery =`
+           ${PREFIXES}
+
+           SELECT DISTINCT ?uri WHERE {
+              BIND(<http://data.vlaanderen.be/ns/mandaat#Mandataris> as ?accessResourceSubject)
+              BIND(${sparqlEscapeUri(account)} as ?account)
+             ${accessResourceSubjectValidation}
+             ${personMandatarisSelection}
+           }`;
+
+    const personData = parseResult(await querySudo(selectPoliticalMandatePersonQuery))[0];
+    uri = personData ? personData.uri : null;
+  }
+
+  if(!uri && accesResourceSubjects.includes('http://data.lblod.info/vocabularies/leidinggevenden/Functionaris')) {
+    const personLeidinggevendeSelection =
+          `GRAPH ?public {
+             ?bestuurseenheid a besluit:Bestuurseenheid.
+             ?bestuursorgaan besluit:bestuurt ?bestuurseenheid.
+             ?bestuursorgaanInTijd mandaat:isTijdspecialisatieVan ?bestuursorgaan.
+
+             ?bestuursorgaanInTijd lblodlg:heeftBestuursfunctie ?bestuursfunctie.
+           }
+
+           GRAPH ?loketGraph {
+             ?functionaris a ?accessResourceSubject.
+             ?functionaris org:holds ?bestuursfunctie.
+             ?functionaris mandaat:isBestuurlijkeAliasVan ?uri.
+           }
+
+           GRAPH ?loketGraph {
+             ?uri a person:Person;
+               adms:identifier ?identifier.
+             ?identifier skos:notation ${sparqlEscapeString(info.rrn)}.
+           }`;
+
+    const selectLeidinggevendePersonQuery =`
+           ${PREFIXES}
+           SELECT DISTINCT ?uri WHERE {
+
+             BIND(<http://data.lblod.info/vocabularies/leidinggevenden/Functionaris> as ?accessResourceSubject)
+             BIND(${sparqlEscapeUri(account)} as ?account)
+
+             ${accessResourceSubjectValidation}
+             ${personLeidinggevendeSelection}
+           }`;
+
+    const personData = parseResult(await querySudo(selectLeidinggevendePersonQuery))[0];
+    uri = personData ? personData.uri : null;
+  }
+}
+
+/**
+ * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ * WARNING: expects authentication and authorization being ok.
+ * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ *
+ * TODO: use function decoractors to ensure authentication preconditions
+ *       are fulfilled. (To avoid accidental mis-use)
+ *
+ * Queries the database in search for the URI of a person for the
+ * supplied info.
+ *
+ * @param info {Object} Information object retrieved from the request.
+ *
  * @param info.organization {string} Request information containing
  * URI of the organization for which the person has been on the list
  * of electables, as a string.
