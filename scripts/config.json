@@ -18,14 +18,14 @@
     },
     {
       "documentation": {
-        "command": "generate-key-aggregated-requester",
+        "command": "generate-key-super-requester",
         "description": "Generate a key for a subject (e.g. http://data.vlaanderen.be/ns/mandaat#Mandataris) and vendor",
         "arguments": ["vendorUri", "subject", "key", "passwordSalt"]
       },
       "environment": {
         "image": "ubuntu",
         "interactive": false,
-        "script": "generate-key/run-aggregated-ssn-access.sh"
+        "script": "generate-key/run-super-requester.sh"
       },
       "mounts": {
         "app": "/data/app/"

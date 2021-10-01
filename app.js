@@ -2,9 +2,9 @@ import bodyParser from 'body-parser';
 import { toRDF } from 'jsonld';
 import _ from 'lodash';
 import { app, errorHandler } from 'mu';
-import { AGGREGATED_SSN_ACCESS_TYPE, SSN_ACCESS_TYPE } from './constants';
+import { SUPER_SSN_ACCESS_TYPE, SSN_ACCESS_TYPE } from './constants';
 import {
-    fetchPersonUriAggregatedSSNAccess, fetchPersonUriRegularSSNAccess, getAccessResourceData,
+    fetchPersonUriSuperSSNAccess, fetchPersonUriRegularSSNAccess, getAccessResourceData,
     getAccountData
 } from './database-queries';
 import { enrichBody, extractInfoFromTriples } from './jsonld-input';
@@ -112,8 +112,8 @@ async function handleRequest( req, res, next ) {
     rrn = rrn.replace( /[^0-9]*/g, '');
     let uri = null;
 
-    if(accessResourceType == AGGREGATED_SSN_ACCESS_TYPE){
-      uri = await fetchPersonUriAggregatedSSNAccess( { rrn, account, accessResourceData } );
+    if(accessResourceType == SUPER_SSN_ACCESS_TYPE){
+      uri = await fetchPersonUriSuperSSNAccess( { rrn, account, accessResourceData } );
     }
 
     else if(accessResourceType == SSN_ACCESS_TYPE){

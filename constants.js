@@ -15,4 +15,4 @@ export const PREFIXES = `
 `;
 
 export const SSN_ACCESS_TYPE = 'http://mu.semte.ch/vocabularies/account/SSNAccess';
-export const AGGREGATED_SSN_ACCESS_TYPE = 'http://mu.semte.ch/vocabularies/account/AggregatedSSNAccess';
+export const SUPER_SSN_ACCESS_TYPE = 'http://mu.semte.ch/vocabularies/account/SuperSSNAccess';

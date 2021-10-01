@@ -102,7 +102,7 @@ export async function getAccessResourceData(account){
  * @return The URI of the person in string format, or null if no
  * person matched the supplied conditions (including access rights).
  */
-export async function fetchPersonUriAggregatedSSNAccess( info ){
+export async function fetchPersonUriSuperSSNAccess( info ){
   const { account, rrn, accessResourceData } = info;
   const accesResourceSubjects = accessResourceData.map( acl => acl.accessResourceSubject );
 
@@ -119,7 +119,7 @@ export async function fetchPersonUriAggregatedSSNAccess( info ){
               acl:agent ?ssnAgent;
               acl:accessTo ?accessResource.
 
-            ?accessResource a muAccount:AggregatedSSNAccess;
+            ?accessResource a muAccount:SuperSSNAccess;
               dcterms:subject ?accessResourceSubject.
          }`;
 

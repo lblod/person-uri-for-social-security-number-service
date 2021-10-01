@@ -38,7 +38,7 @@ INSERT {
    <http://data.lblod.info/acls/$ACLS_UUID> acl:mode <http://data.lblod.info/codelists/access-modes/read>.
    <http://data.lblod.info/acls/$ACLS_UUID> acl:accessTo <http://data.lblod.info/information-resources/$INFORMATION_RESOURCE_UUID>.
 
-   <http://data.lblod.info/information-resources/$INFORMATION_RESOURCE_UUID> a muAccount:AggregatedSSNAccess.
+   <http://data.lblod.info/information-resources/$INFORMATION_RESOURCE_UUID> a muAccount:SuperSSNAccess.
    <http://data.lblod.info/information-resources/$INFORMATION_RESOURCE_UUID> dcterms:subject <$SUBJECT>.
   }
 } WHERE {
