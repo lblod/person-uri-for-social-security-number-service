@@ -103,8 +103,9 @@ mu script person-uri-for-social-security-number generate-key-regular-requester <
 ```
 Generate a key for an aggregated requester
 ```
-mu script person-uri-for-social-security-number generate-key-regular-requester <vendorUri> <http://theTheme> <key> <passwordSalt>
+mu script person-uri-for-social-security-number generate-key-super-requester <vendorUri> <http://theTheme> <key> <passwordSalt>
 ```
+Note: `<http://theTheme>` can be either  `mandaat:Mandataris` or `lblodlg:Functionaris`
 
 ### Create mandatarissen
 
