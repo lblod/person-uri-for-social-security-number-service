@@ -49,6 +49,13 @@ export async function getAccountData(request, vendor, key){
 }
 
 /**
+ * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ * WARNING: expects authentication and authorization being ok.
+ * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ *
+ * TODO: use function decoractors to ensure authentication preconditions
+ *       are fulfilled. (To avoid accidental mis-use)
+ *
  * Queries the database in search for the URI of a person for the
  * supplied info.
  *
@@ -62,16 +69,12 @@ export async function getAccountData(request, vendor, key){
  * of the person (Social security number or Rijksregisternummer) as a
  * string.
  *
- * @param info.vendorKey {string} Request information containing
- * the key of the vendor as a string.
- *
- * @param info.vendor {string} Request information containing the URI
- * of the vendor as a string.
+ * @param info.account {string} Uri of the account asking for the data
  *
  * @return The URI of the person in string format, or null if no
  * person matched the supplied conditions (including access rights).
  */
-export async function fetchPersonUri( info ) {
+export async function fetchPersonUriRegularSSNAccess( info ) {
   const prefixes = PREFIXES;
 
   const personKieslijstSelection =
@@ -129,27 +132,11 @@ export async function fetchPersonUri( info ) {
 
   const accessValidation =
         `GRAPH ?accessGraph {
-
-          ${sparqlEscapeUri(info.vendor)} acl:member ?ssnAgent.
-
-          ?ssnAgent a muAccount:SSNAgent;
-            foaf:account ?account.
-
-          ?account a foaf:OnlineAccount;
-            muAccount:salt ?salt.
-
-          BIND( SHA512 ( CONCAT( ${sparqlEscapeString(info.vendorKey)}, STR(?salt) ) ) as ?hashedKey )
-
-          ?account muAccount:key ?hashedKey.
-
-          ?authorization a acl:Authorization;
-            acl:agent ?ssnAgent;
-            acl:mode ${sparqlEscapeUri("http://data.lblod.info/codelists/access-modes/read")};
-            acl:accessTo ?access.
-
-          ?access a ${sparqlEscapeUri(SSN_ACCESS_TYPE)};
-            dcterms:subject ${sparqlEscapeUri(info.organization)}.
-
+           ?ssnAgent foaf:account ${sparqlEscapeUri(info.account)}.
+           ?authorization acl:agent ?ssnAgent.
+           ?authorization acl:mode ${sparqlEscapeUri("http://data.lblod.info/codelists/access-modes/read")}.
+           ?authorization acl:accessTo ?access.
+           ?access dcterms:subject ${sparqlEscapeUri(info.organization)}.
          }`;
 
 

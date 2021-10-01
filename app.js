@@ -82,7 +82,7 @@ async function handleRequest( req, res, next ) {
     //Strip non numeric chars from rrn.
     rrn = rrn.replace( /[^0-9]*/g, '');
     // fetch uri and verify access
-    const uri = await fetchPersonUri( { organization, rrn, subject, vendorKey, vendor, dataRequest } );
+    const uri = await fetchPersonUri( { organization, rrn, subject, account } );
 
     if( uri ) {
       res
