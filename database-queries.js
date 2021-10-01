@@ -7,6 +7,48 @@ import { parseResult } from './utils';
 const ACCESS_GRAPH = process.env.ACCESS_GRAPH || 'http://mu.semte.ch/graphs/ssn-access-control';
 
 /**
+ * Given a vendor, a vendorKey and a request, we fetch the account related
+ * to the provided paramaters.
+ * This effectively validates key/vendor set and returns the account
+ *
+ * @param request {Object} The request object.
+ *        Note: in future, this will be used to validate ACM/IDM parameters
+ *
+ * @param key {string} Request information containing the key of the vendor as a string.
+ *
+ * @param vendor {string} Request information containing the URI
+ * of the vendor as a string.
+ *
+ * @return The URI of the account
+ */
+export async function getAccountData(request, vendor, key){
+  //TODO: later, for acm integration, we need to parse headers and pass these to acm
+  const accountQuery = `
+   ${PREFIXES}
+
+   SELECT DISTINCT ?account WHERE {
+     GRAPH <http://mu.semte.ch/graphs/ssn-access-control> {
+
+          ${sparqlEscapeUri(vendor)} acl:member ?ssnAgent.
+
+          ?ssnAgent a muAccount:SSNAgent;
+            foaf:account ?account.
+
+          ?account a foaf:OnlineAccount;
+            muAccount:salt ?salt.
+
+          BIND( SHA512 ( CONCAT( ${sparqlEscapeString(key)}, STR(?salt) ) ) as ?hashedKey )
+
+          ?account a foaf:OnlineAccount;
+            muAccount:key ?hashedKey.
+     }
+   }
+  `;
+
+  return parseResult(await querySudo(accountQuery));
+}
+
+/**
  * Queries the database in search for the URI of a person for the
  * supplied info.
  *
