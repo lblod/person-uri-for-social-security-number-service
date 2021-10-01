@@ -4,8 +4,6 @@ import { sparqlEscapeDateTime, sparqlEscapeInt, sparqlEscapeString, sparqlEscape
 import { PREFIXES } from './constants';
 import { parseResult } from './utils';
 
-const PASSWORD_SALT = process.env.PASSWORD_SALT;
-if(!PASSWORD_SALT) throw Error('A system password salt is required.');
 
 const ACCESS_GRAPH = process.env.ACCESS_GRAPH || 'http://mu.semte.ch/graphs/ssn-access-control';
 
