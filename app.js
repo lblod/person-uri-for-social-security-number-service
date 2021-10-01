@@ -1,7 +1,7 @@
 import bodyParser from 'body-parser';
 import { toRDF } from 'jsonld';
 import { app, errorHandler } from 'mu';
-import { fetchPersonUri, getAccountData } from './database-queries';
+import { fetchPersonUri, getAccountData, getAccessResourceData } from './database-queries';
 import { enrichBody, extractInfoFromTriples } from './jsonld-input';
 import { hadTooManyAttemptsWithinTimespan, manageAttemptsData } from './ssn-brute-force-security';
 
@@ -77,6 +77,26 @@ async function handleRequest( req, res, next ) {
         }));
 
       return;
+    }
+
+    //Check authorization
+    const accessResourceData = await getAccessResourceData(account);
+
+    if(!accessResourceData.length){
+      res
+        .status(403)
+        .send( JSON.stringify({
+          "message": "Unauthorized",
+          "code": 403
+        }));
+
+      return;
+    }
+
+    //Check account integrity
+    const accessResourceTypes = _.uniq(accessResourceData.map(d => d.accessResourceType));
+    if( accessResourceTypes.length > 1 ){
+      throw `Multiple AccessResourceTypes for ${account} were found, only one is supported`;
     }
 
     //Strip non numeric chars from rrn.

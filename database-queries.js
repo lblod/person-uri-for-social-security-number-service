@@ -49,6 +49,36 @@ export async function getAccountData(request, vendor, key){
 }
 
 /**
+ * Returns information about the type of InformationResource the account is authorized to.
+ *
+ * @param account {string} URI account
+ *
+ * @return [ {acl, accessResource, accessResourceType, accessResourceSubject} ]
+ */
+export async function getAccessResourceData(account){
+  const aclQuery = `
+   ${PREFIXES}
+
+   SELECT DISTINCT ?acl ?accessResource ?accessResourceType ?accessResourceSubject WHERE {
+     GRAPH <http://mu.semte.ch/graphs/ssn-access-control> {
+
+          ?ssnAgent a muAccount:SSNAgent;
+            foaf:account ${sparqlEscapeUri(account)}.
+
+           ?acl acl:agent ?ssnAgent;
+             a acl:Authorization;
+             acl:accessTo ?accessResource.
+
+           ?accessResource a ?accessResourceType;
+            dcterms:subject ?accessResourceSubject.
+     }
+   }
+  `;
+
+  return parseResult(await querySudo(aclQuery));
+}
+
+/**
  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  * WARNING: expects authentication and authorization being ok.
  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
