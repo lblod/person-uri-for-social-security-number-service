@@ -233,10 +233,18 @@ export async function clearSSNAttemptsDataForAccount( { vendor, vendorKey } ){
     }
     WHERE {
       GRAPH ${ sparqlEscapeUri(ACCESS_GRAPH) } {
-        BIND( SHA512 (${sparqlEscapeString(vendorKey + PASSWORD_SALT)}) as ?hashedKey )
         ${sparqlEscapeUri(vendor)} acl:member ?ssnAgent.
-        ?ssnAgent foaf:account ?account.
-        ?account muAccount:key ?hashedKey.
+
+        ?ssnAgent a muAccount:SSNAgent;
+          foaf:account ?account.
+
+        ?account a foaf:OnlineAccount;
+          muAccount:salt ?salt.
+
+        BIND( SHA512 ( CONCAT( ${sparqlEscapeString(vendorKey)}, STR(?salt) ) ) as ?hashedKey )
+
+        ?account a foaf:OnlineAccount;
+          muAccount:key ?hashedKey.
 
         OPTIONAL { ?account ext:ssnAttempts ?attempts. }
         OPTIONAL { ?account ext:ssnLastAttemptAt ?lastAttemptAt. }
