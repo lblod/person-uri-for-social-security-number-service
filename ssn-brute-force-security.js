@@ -6,8 +6,8 @@ import {
 const MAX_CONSECUTIVE_ATTEMPTS = parseInt( process.env.MAX_CONSECUTIVE_ATTEMPTS_WITHIN_TIMESPAN || 1000 );
 const WAIT_BETWEEN_MAX_CONSECUTIVE_ATTEMPTS = parseInt( process.env.MAX_CONSECUTIVE_ATTEMPTS_TIMESPAN || 30000 );
 
-export async function hadTooManyAttemptsWithinTimespan( { vendor, vendorKey } ){
-  const attemptsData = await getSSNAttemptsDataForAccount( { vendor, vendorKey } );
+export async function hadTooManyAttemptsWithinTimespan( { account }){
+  const attemptsData = await getSSNAttemptsDataForAccount( account );
   if(!attemptsData) return false;
   else{
     if( attemptsData.attempts >= MAX_CONSECUTIVE_ATTEMPTS
@@ -18,22 +18,22 @@ export async function hadTooManyAttemptsWithinTimespan( { vendor, vendorKey } ){
   }
 }
 
-export async function manageAttemptsData( { vendor, vendorKey } ){
-  await clearAttemptsDataIfPossible( { vendor, vendorKey } );
-  await incrementAttemptsData( { vendor, vendorKey } );
+export async function manageAttemptsData( { account } ){
+  await clearAttemptsDataIfPossible( account  );
+  await incrementAttemptsData( account  );
 }
 
-export async function clearAttemptsDataIfPossible( { vendor, vendorKey } ){
-  const attemptsData = await getSSNAttemptsDataForAccount( { vendor, vendorKey } );
+export async function clearAttemptsDataIfPossible(  account ){
+  const attemptsData = await getSSNAttemptsDataForAccount( account );
   if(attemptsData){
     if( (new Date() - attemptsData.lastAttemptAt) > WAIT_BETWEEN_MAX_CONSECUTIVE_ATTEMPTS ){
-      await clearSSNAttemptsDataForAccount( { vendor, vendorKey } );
+      await clearSSNAttemptsDataForAccount( account );
     }
   }
 }
 
-export async function incrementAttemptsData( { vendor, vendorKey } ){
-  const data = await getSSNAttemptsDataForAccount( { vendor, vendorKey } );
+export async function incrementAttemptsData( account ){
+  const data = await getSSNAttemptsDataForAccount( account );
   const incrementedAttempt = ( data && data.attempts || 0 ) + 1;
-  updateSSNAttemptsDataForAccount( { vendor, vendorKey, attempts : incrementedAttempt, lastAttemptAt: new Date() });
+  updateSSNAttemptsDataForAccount( { account, attempts : incrementedAttempt, lastAttemptAt: new Date() });
 }

@@ -184,25 +184,16 @@ function buildPersonQueryString(prefixes, accessValidation, personSelection){
  *
  * @return {Object} { attempts, lastAttemptAt }
  */
-export async function getSSNAttemptsDataForAccount( { vendor, vendorKey } ){
+export async function getSSNAttemptsDataForAccount( account ){
+  //TODO: this needs fine tuning for ACM
   const query = `
     ${PREFIXES}
+
     SELECT DISTINCT ?account ?attempts ?lastAttemptAt
     WHERE {
       GRAPH ${ sparqlEscapeUri(ACCESS_GRAPH) } {
-        ${sparqlEscapeUri(vendor)} acl:member ?ssnAgent.
-
-        ?ssnAgent a muAccount:SSNAgent;
-          foaf:account ?account.
-
-        ?account a foaf:OnlineAccount;
-          muAccount:salt ?salt.
-
-        BIND( SHA512 ( CONCAT( ${sparqlEscapeString(vendorKey)}, STR(?salt) ) ) as ?hashedKey )
-
-        ?account a foaf:OnlineAccount;
-          muAccount:key ?hashedKey.
-
+        BIND( ${sparqlEscapeUri(account)} as ?account)
+        ?account a foaf:OnlineAccount.
         ?account ext:ssnAttempts ?attempts.
         ?account ext:ssnLastAttemptAt ?lastAttemptAt.
       }
@@ -218,7 +209,7 @@ export async function getSSNAttemptsDataForAccount( { vendor, vendorKey } ){
  * @param {Object} Information relevant for the updating of the  data of an account { vendor, vendorKey, attempts, lastAttemptAt }.
  *
  */
-export async function updateSSNAttemptsDataForAccount( { vendor, vendorKey, attempts, lastAttemptAt } ) {
+export async function updateSSNAttemptsDataForAccount( { account, attempts, lastAttemptAt } ) {
   const query = `
     ${PREFIXES}
 
@@ -236,18 +227,8 @@ export async function updateSSNAttemptsDataForAccount( { vendor, vendorKey, atte
     }
     WHERE {
       GRAPH ${ sparqlEscapeUri(ACCESS_GRAPH) } {
-        ${sparqlEscapeUri(vendor)} acl:member ?ssnAgent.
-
-        ?ssnAgent a muAccount:SSNAgent;
-          foaf:account ?account.
-
-        ?account a foaf:OnlineAccount;
-          muAccount:salt ?salt.
-
-        BIND( SHA512 ( CONCAT( ${sparqlEscapeString(vendorKey)}, STR(?salt) ) ) as ?hashedKey )
-
-        ?account a foaf:OnlineAccount;
-          muAccount:key ?hashedKey.
+        BIND( ${sparqlEscapeUri(account)} as ?account)
+        ?account a foaf:OnlineAccount.
 
         OPTIONAL { ?account ext:ssnAttempts ?attempts. }
         OPTIONAL { ?account ext:ssnLastAttemptAt ?lastAttemptAt. }
@@ -263,9 +244,9 @@ export async function updateSSNAttemptsDataForAccount( { vendor, vendorKey, atte
  * @param {Object} Information relevant for the clearing the  data of an account { vendor, vendorKey }.
  *
  */
-export async function clearSSNAttemptsDataForAccount( { vendor, vendorKey } ){
+export async function clearSSNAttemptsDataForAccount( account ){
   const query = `
-    ${PREFIXES}
+   ${PREFIXES}
 
     DELETE {
       GRAPH ${ sparqlEscapeUri(ACCESS_GRAPH) } {
@@ -275,18 +256,8 @@ export async function clearSSNAttemptsDataForAccount( { vendor, vendorKey } ){
     }
     WHERE {
       GRAPH ${ sparqlEscapeUri(ACCESS_GRAPH) } {
-        ${sparqlEscapeUri(vendor)} acl:member ?ssnAgent.
-
-        ?ssnAgent a muAccount:SSNAgent;
-          foaf:account ?account.
-
-        ?account a foaf:OnlineAccount;
-          muAccount:salt ?salt.
-
-        BIND( SHA512 ( CONCAT( ${sparqlEscapeString(vendorKey)}, STR(?salt) ) ) as ?hashedKey )
-
-        ?account a foaf:OnlineAccount;
-          muAccount:key ?hashedKey.
+        BIND( ${sparqlEscapeUri(account)} as ?account)
+        ?account a foaf:OnlineAccount.
 
         OPTIONAL { ?account ext:ssnAttempts ?attempts. }
         OPTIONAL { ?account ext:ssnLastAttemptAt ?lastAttemptAt. }
