@@ -293,7 +293,7 @@ export async function fetchPersonUriRegularSSNAccess( info ) {
   for(const pathToPerson of potentialPathsToPersons){
     let rrnData = parseResult(await querySudo(buildPersonQueryString(prefixes, accessValidation, pathToPerson)));
     if(rrnData.length && rrnData[0].uri){
-      return rrnData.uri;
+      return rrnData[0].uri;
     }
   }
   return null;
