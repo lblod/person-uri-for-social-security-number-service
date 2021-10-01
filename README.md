@@ -79,7 +79,11 @@ The service offers scripts to create migrations.
 Generate a key for a pair of bestuurseenheid and vendor.
 
 ```
-mu script person-uri-for-social-security-number generate-key <vendorUri> <bestuurseenheidUri> <key> <passwordSalt>
+mu script person-uri-for-social-security-number generate-key-regular-requester <vendorUri> <bestuurseenheidUri> <key> <passwordSalt>
+```
+Generate a key for an aggregated requester
+```
+mu script person-uri-for-social-security-number generate-key-regular-requester <vendorUri> <http://theTheme> <key> <passwordSalt>
 ```
 
 ### Create mandatarissen
