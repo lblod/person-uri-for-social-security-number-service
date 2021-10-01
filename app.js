@@ -3,10 +3,10 @@ import { toRDF } from 'jsonld';
 import _ from 'lodash';
 import { app, errorHandler } from 'mu';
 import { AGGREGATED_SSN_ACCESS_TYPE, SSN_ACCESS_TYPE } from './constants';
-import { fetchPersonUriRegularSSNAccess,
-         fetchPersonUriAggregatedSSNAccess,
-         getAccessResourceData,
-         getAccountData } from './database-queries';
+import {
+    fetchPersonUriAggregatedSSNAccess, fetchPersonUriRegularSSNAccess, getAccessResourceData,
+    getAccountData
+} from './database-queries';
 import { enrichBody, extractInfoFromTriples } from './jsonld-input';
 import { hadTooManyAttemptsWithinTimespan, manageAttemptsData } from './ssn-brute-force-security';
 

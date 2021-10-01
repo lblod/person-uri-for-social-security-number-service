@@ -1,7 +1,6 @@
 import { querySudo } from '@lblod/mu-auth-sudo';
-import _ from 'lodash';
 import { sparqlEscapeDateTime, sparqlEscapeInt, sparqlEscapeString, sparqlEscapeUri } from 'mu';
-import { PREFIXES, SSN_ACCESS_TYPE } from './constants';
+import { PREFIXES } from './constants';
 import { parseResult } from './utils';
 
 const ACCESS_GRAPH = process.env.ACCESS_GRAPH || 'http://mu.semte.ch/graphs/ssn-access-control';
