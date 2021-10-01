@@ -1,6 +1,7 @@
 import { querySudo } from '@lblod/mu-auth-sudo';
 import { sparqlEscapeUri, sparqlEscapeString, sparqlEscapeInt, sparqlEscapeDateTime } from 'mu';
 import _ from 'lodash';
+import { PREFIXES } from './constants';
 
 const PASSWORD_SALT = process.env.PASSWORD_SALT;
 if(!PASSWORD_SALT) throw Error('A system password salt is required.');
@@ -31,19 +32,7 @@ const ACCESS_GRAPH = process.env.ACCESS_GRAPH || 'http://mu.semte.ch/graphs/ssn-
  * person matched the supplied conditions (including access rights).
  */
 export async function fetchPersonUri( info ) {
-  const prefixes =
-        `PREFIX mandaat: <http://data.vlaanderen.be/ns/mandaat#>
-         PREFIX besluit: <http://data.vlaanderen.be/ns/besluit#>
-         PREFIX rrn: <http://data.lblod.info/vocabularies/rrn/>
-         PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-         PREFIX adms: <http://www.w3.org/ns/adms#>
-         PREFIX person: <http://www.w3.org/ns/person#>
-         PREFIX lblodlg: <http://data.lblod.info/vocabularies/leidinggevenden/>
-         PREFIX org: <http://www.w3.org/ns/org#>
-         PREFIX acl: <http://www.w3.org/ns/auth/acl#>
-         PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-         PREFIX muAccount: <http://mu.semte.ch/vocabularies/account/>
-         PREFIX dcterms: <http://purl.org/dc/terms/>`;
+  const prefixes = PREFIXES;
 
   const personKieslijstSelection =
         `GRAPH ?public {
@@ -145,11 +134,7 @@ function buildPersonQueryString(prefixes, accessValidation, personSelection){
  */
 export async function getSSNAttemptsDataForAccount( { vendor, vendorKey } ){
   const query = `
-    PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
-    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-    PREFIX muAccount: <http://mu.semte.ch/vocabularies/account/>
-    PREFIX acl: <http://www.w3.org/ns/auth/acl#>
-
+    ${PREFIXES}
     SELECT DISTINCT ?account ?attempts ?lastAttemptAt
     WHERE {
       GRAPH ${ sparqlEscapeUri(ACCESS_GRAPH) } {
@@ -183,10 +168,7 @@ export async function getSSNAttemptsDataForAccount( { vendor, vendorKey } ){
  */
 export async function updateSSNAttemptsDataForAccount( { vendor, vendorKey, attempts, lastAttemptAt } ) {
   const query = `
-    PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
-    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-    PREFIX muAccount: <http://mu.semte.ch/vocabularies/account/>
-    PREFIX acl: <http://www.w3.org/ns/auth/acl#>
+    ${PREFIXES}
 
     DELETE {
       GRAPH ${ sparqlEscapeUri(ACCESS_GRAPH) } {
@@ -223,10 +205,7 @@ export async function updateSSNAttemptsDataForAccount( { vendor, vendorKey, atte
  */
 export async function clearSSNAttemptsDataForAccount( { vendor, vendorKey } ){
   const query = `
-    PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
-    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-    PREFIX muAccount: <http://mu.semte.ch/vocabularies/account/>
-    PREFIX acl: <http://www.w3.org/ns/auth/acl#>
+    ${PREFIXES}
 
     DELETE {
       GRAPH ${ sparqlEscapeUri(ACCESS_GRAPH) } {
