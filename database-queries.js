@@ -1,9 +1,8 @@
 import { querySudo } from '@lblod/mu-auth-sudo';
 import _ from 'lodash';
 import { sparqlEscapeDateTime, sparqlEscapeInt, sparqlEscapeString, sparqlEscapeUri } from 'mu';
-import { PREFIXES } from './constants';
+import { PREFIXES, SSN_ACCESS_TYPE } from './constants';
 import { parseResult } from './utils';
-
 
 const ACCESS_GRAPH = process.env.ACCESS_GRAPH || 'http://mu.semte.ch/graphs/ssn-access-control';
 
@@ -89,14 +88,26 @@ export async function fetchPersonUri( info ) {
   const accessValidation =
         `GRAPH ?accessGraph {
 
-           BIND( SHA512 (${sparqlEscapeString(info.vendorKey + PASSWORD_SALT)}) as ?hashedKey )
-           ${sparqlEscapeUri(info.vendor)} acl:member ?ssnAgent.
-           ?ssnAgent foaf:account ?account.
-           ?account muAccount:key ?hashedKey.
-           ?authorization acl:agent ?ssnAgent.
-           ?authorization acl:mode ${sparqlEscapeUri("http://data.lblod.info/codelists/access-modes/read")}.
-           ?authorization acl:accessTo ?access.
-           ?access dcterms:subject ${sparqlEscapeUri(info.organization)}.
+          ${sparqlEscapeUri(info.vendor)} acl:member ?ssnAgent.
+
+          ?ssnAgent a muAccount:SSNAgent;
+            foaf:account ?account.
+
+          ?account a foaf:OnlineAccount;
+            muAccount:salt ?salt.
+
+          BIND( SHA512 ( CONCAT( ${sparqlEscapeString(info.vendorKey)}, STR(?salt) ) ) as ?hashedKey )
+
+          ?account muAccount:key ?hashedKey.
+
+          ?authorization a acl:Authorization;
+            acl:agent ?ssnAgent;
+            acl:mode ${sparqlEscapeUri("http://data.lblod.info/codelists/access-modes/read")};
+            acl:accessTo ?access.
+
+          ?access a ${sparqlEscapeUri(SSN_ACCESS_TYPE)};
+            dcterms:subject ${sparqlEscapeUri(info.organization)}.
+
          }`;
 
 
