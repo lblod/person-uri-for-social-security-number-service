@@ -1,7 +1,7 @@
 import bodyParser from 'body-parser';
 import { toRDF } from 'jsonld';
 import { app, errorHandler } from 'mu';
-import { fetchPersonUri } from './database-queries';
+import { fetchPersonUri, getAccountData } from './database-queries';
 import { enrichBody, extractInfoFromTriples } from './jsonld-input';
 import { hadTooManyAttemptsWithinTimespan, manageAttemptsData } from './ssn-brute-force-security';
 
@@ -45,7 +45,30 @@ async function handleRequest( req, res, next ) {
       return;
     }
 
-    if(await hadTooManyAttemptsWithinTimespan( { vendor, vendorKey } )){
+    //Authenticate
+    const accountData = await getAccountData(req, vendor, vendorKey);
+
+    if(!accountData.length){
+      res
+        .status(401)
+        .send( JSON.stringify({
+          "message": "Unauthorized",
+          "code": 401
+        }));
+
+      return;
+    }
+
+    //Check account integrity
+    if(accountData.length > 1 ){
+      //For a pair of key en vendor uri (or acm token) we expect only one account
+      throw `Multiple accounts found for ${vendor}`;
+    }
+
+    const account = accountData[0].account;
+
+    //Block brute forcing of RRN
+    if(await hadTooManyAttemptsWithinTimespan({ account })){
       res
         .status(429)
         .send( JSON.stringify({
@@ -62,8 +85,6 @@ async function handleRequest( req, res, next ) {
     const uri = await fetchPersonUri( { organization, rrn, subject, vendorKey, vendor, dataRequest } );
 
     if( uri ) {
-      // return the response
-      await manageAttemptsData( { vendor, vendorKey } );
       res
         .status(200)
         .send( JSON.stringify({
@@ -74,7 +95,6 @@ async function handleRequest( req, res, next ) {
         }) );
     }
     else {
-      await manageAttemptsData( { vendor, vendorKey } );
       res
         .status(404)
         .send( JSON.stringify({
@@ -82,6 +102,9 @@ async function handleRequest( req, res, next ) {
           "code": 404
         }) );
     }
+
+    //After response -to speed up call- manage access data
+    await manageAttemptsData( { account } );
   }
   catch(e) {
     console.error(e);
