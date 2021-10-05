@@ -104,7 +104,7 @@ export async function getAccessResourceData(account){
  */
 export async function fetchPersonUriSuperSSNAccess( info ){
   const { account, rrn, accessResourceData } = info;
-  const accesResourceSubjects = accessResourceData.map( acl => acl.accessResourceSubject );
+  const accessResourceSubjects = accessResourceData.map( acl => acl.accessResourceSubject );
 
   let uri = null;
 
@@ -123,7 +123,7 @@ export async function fetchPersonUriSuperSSNAccess( info ){
               dcterms:subject ?accessResourceSubject.
          }`;
 
-  if( accesResourceSubjects.includes('http://data.lblod.info/id/conceptscheme/LocalPoliticianMandateRole') ){
+  if( accessResourceSubjects.includes('http://data.lblod.info/id/conceptscheme/LocalPoliticianMandateRole') ){
     const personMandatarisSelection =
           `GRAPH ?public {
              ?bestuurseenheid a besluit:Bestuurseenheid.
@@ -158,7 +158,7 @@ export async function fetchPersonUriSuperSSNAccess( info ){
     uri = personData ? personData.uri : null;
   }
 
-  if(!uri && accesResourceSubjects.includes('http://data.lblod.info/id/conceptscheme/LocalOfficerMandateRole')) {
+  if(!uri && accessResourceSubjects.includes('http://data.lblod.info/id/conceptscheme/LocalOfficerMandateRole')) {
     const personLeidinggevendeSelection =
           `GRAPH ?public {
              ?bestuurseenheid a besluit:Bestuurseenheid.
