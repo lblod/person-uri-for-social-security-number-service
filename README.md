@@ -88,7 +88,7 @@ See [https://lblod.data.gift/vocabularies/ssn-acl](https://lblod.data.gift/vocab
 #### Notes
 
 The scope of `muAccount:SSNAccess` is imited to data within a bestuurseenheid
-The scope of `muAccount:SuperSSNAccess` is limited to a class type, currently supported `http://data.lblod.info/id/conceptscheme/LocalPoliticianMandateRole` or `http://data.lblod.info/id/conceptscheme/LocalOfficerMandateRole`.
+The scope of `muAccount:SuperSSNAccess` is limited to specific Concept Schemes, currently supported `http://data.lblod.info/id/conceptscheme/LocalPoliticianMandateRole` or `http://data.lblod.info/id/conceptscheme/LocalOfficerMandateRole`.
 
 ## Scripts
 
