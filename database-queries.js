@@ -123,17 +123,19 @@ export async function fetchPersonUriSuperSSNAccess( info ){
               dcterms:subject ?accessResourceSubject.
          }`;
 
-  if( accesResourceSubjects.includes('http://data.vlaanderen.be/ns/mandaat#Mandataris') ){
+  if( accesResourceSubjects.includes('http://data.lblod.info/id/conceptscheme/LocalPoliticianMandateRole') ){
     const personMandatarisSelection =
           `GRAPH ?public {
              ?bestuurseenheid a besluit:Bestuurseenheid.
              ?bestuursorgaan besluit:bestuurt ?bestuurseenheid.
              ?bestuursorgaanInTijd mandaat:isTijdspecialisatieVan ?bestuursorgaan.
              ?bestuursorgaanInTijd org:hasPost ?mandaat.
+             ?mandaat org:role ?role.
+             ?role skos:inScheme ?accessResourceSubject.
            }
 
            GRAPH ?loketGraph {
-             ?mandataris a ?accessResourceSubject.
+             ?mandataris a <http://data.vlaanderen.be/ns/mandaat#Mandataris>.
              ?mandataris org:holds ?mandaat.
              ?mandataris mandaat:isBestuurlijkeAliasVan ?uri.
              ?uri a person:Person;
@@ -146,7 +148,7 @@ export async function fetchPersonUriSuperSSNAccess( info ){
            ${PREFIXES}
 
            SELECT DISTINCT ?uri WHERE {
-              BIND(<http://data.vlaanderen.be/ns/mandaat#Mandataris> as ?accessResourceSubject)
+              BIND(<http://data.lblod.info/id/conceptscheme/LocalPoliticianMandateRole> as ?accessResourceSubject)
               BIND(${sparqlEscapeUri(account)} as ?account)
              ${accessResourceSubjectValidation}
              ${personMandatarisSelection}
@@ -156,7 +158,7 @@ export async function fetchPersonUriSuperSSNAccess( info ){
     uri = personData ? personData.uri : null;
   }
 
-  if(!uri && accesResourceSubjects.includes('http://data.lblod.info/vocabularies/leidinggevenden/Functionaris')) {
+  if(!uri && accesResourceSubjects.includes('http://data.lblod.info/id/conceptscheme/LocalOfficerMandateRole')) {
     const personLeidinggevendeSelection =
           `GRAPH ?public {
              ?bestuurseenheid a besluit:Bestuurseenheid.
@@ -164,10 +166,12 @@ export async function fetchPersonUriSuperSSNAccess( info ){
              ?bestuursorgaanInTijd mandaat:isTijdspecialisatieVan ?bestuursorgaan.
 
              ?bestuursorgaanInTijd lblodlg:heeftBestuursfunctie ?bestuursfunctie.
+             ?bestuursfunctie org:role ?role.
+             ?role skos:inScheme ?accessResourceSubject.
            }
 
            GRAPH ?loketGraph {
-             ?functionaris a ?accessResourceSubject.
+             ?functionaris a <http://data.lblod.info/vocabularies/leidinggevenden/Functionaris>.
              ?functionaris org:holds ?bestuursfunctie.
              ?functionaris mandaat:isBestuurlijkeAliasVan ?uri.
            }
@@ -182,7 +186,7 @@ export async function fetchPersonUriSuperSSNAccess( info ){
            ${PREFIXES}
            SELECT DISTINCT ?uri WHERE {
 
-             BIND(<http://data.lblod.info/vocabularies/leidinggevenden/Functionaris> as ?accessResourceSubject)
+             BIND(<http://data.lblod.info/id/conceptscheme/LocalOfficerMandateRole> as ?accessResourceSubject)
              BIND(${sparqlEscapeUri(account)} as ?account)
 
              ${accessResourceSubjectValidation}
