@@ -88,7 +88,7 @@ See [https://lblod.data.gift/vocabularies/ssn-acl](https://lblod.data.gift/vocab
 #### Notes
 
 The scope of `muAccount:SSNAccess` is imited to data within a bestuurseenheid
-The scope of `muAccount:SuperSSNAccess` is limited to a class type, currently supported `mandaat:Mandataris` and `lblodlg:Functionaris`
+The scope of `muAccount:SuperSSNAccess` is limited to a class type, currently supported `http://data.lblod.info/id/conceptscheme/LocalPoliticianMandateRole` or `http://data.lblod.info/id/conceptscheme/LocalOfficerMandateRole`.
 
 ## Scripts
 
@@ -105,7 +105,7 @@ Generate a key for an aggregated requester
 ```
 mu script person-uri-for-social-security-number generate-key-super-requester <vendorUri> <http://theTheme> <key> <passwordSalt>
 ```
-Note: `<http://theTheme>` can be either  `mandaat:Mandataris` or `lblodlg:Functionaris`
+Note: `<http://theTheme>` can be either `http://data.lblod.info/id/conceptscheme/LocalPoliticianMandateRole` or `http://data.lblod.info/id/conceptscheme/LocalOfficerMandateRole`
 
 ### Create mandatarissen
 
