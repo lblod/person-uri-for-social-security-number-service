@@ -31,6 +31,7 @@ INSERT {
    # salt:\"$PASSWORD_SALT\"
    # muAccount:key SHA512(\"$KEY$PASSWORD_SALT\")
    <http://data.lblod.info/accounts/$ACCOUNT_UUID> muAccount:key ?shaKey.
+   <http://data.lblod.info/accounts/$ACCOUNT_UUID> muAccount:salt \"$PASSWORD_SALT\".
 
    <http://data.lblod.info/acls/$ACLS_UUID> acl:agent <http://data.lblod.info/agents/$AGENT_UUID>.
    <http://data.lblod.info/acls/$ACLS_UUID> a acl:Authorization.

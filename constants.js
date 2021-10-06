@@ -13,3 +13,5 @@ export const PREFIXES = `
    PREFIX dcterms: <http://purl.org/dc/terms/>
    PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
 `;
+
+export const SSN_ACCESS_TYPE = 'http://mu.semte.ch/vocabularies/account/SSNAccess';

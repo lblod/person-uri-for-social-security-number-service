@@ -7,11 +7,8 @@ Add the following snippet to your `docker-compose.yml`:
 ```yml
   person-uri-for-social-security-number-service:
     image: lblod/person-uri-for-social-security-number-service
-    environment:
-      PASSWORD_SALT: "a-randomly-generated-password-salt"
 ```
 The following environment variables are availible:
- - `PASSWORD_SALT`: a system wide salt to generate correct hashes of the keys [REQUIRED]
  - `ACCESS_GRAPH`: the graph where account data of vendors are stored, defaults to `http://mu.semte.ch/graphs/ssn-access-control`
  - `MAX_CONSECUTIVE_ATTEMPTS_WITHIN_TIMESPAN`: To avoid brute force SSN deduction, the agent is allowed a max amount of attempts within a timespan. Defaults to 1000 attempts.
  - `MAX_CONSECUTIVE_ATTEMPTS_TIMESPAN`: The length of the timespan. Defaults to 30 seconds.
