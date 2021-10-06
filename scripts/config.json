@@ -3,14 +3,29 @@
   "scripts": [
     {
       "documentation": {
-        "command": "generate-key",
+        "command": "generate-key-regular-requester",
         "description": "Generate a key for a pair of bestuurseenheid and vendor",
         "arguments": ["vendorUri", "besuurseenheidUri", "key", "passwordSalt"]
       },
       "environment": {
         "image": "ubuntu",
         "interactive": false,
-        "script": "generate-key/run.sh"
+        "script": "generate-key/run-regular-requester.sh"
+      },
+      "mounts": {
+        "app": "/data/app/"
+      }
+    },
+    {
+      "documentation": {
+        "command": "generate-key-super-requester",
+        "description": "Generate a key for a subject (e.g. http://data.vlaanderen.be/ns/mandaat#Mandataris) and vendor",
+        "arguments": ["vendorUri", "subject", "key", "passwordSalt"]
+      },
+      "environment": {
+        "image": "ubuntu",
+        "interactive": false,
+        "script": "generate-key/run-super-requester.sh"
       },
       "mounts": {
         "app": "/data/app/"

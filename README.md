@@ -26,7 +26,7 @@ Configure the dispatcher by adding the following rule:
 See also: https://lblod.github.io/pages-vendors/#/docs/rijksregisternummer-api
 
 
-In its simplest form:
+#### Regular request
 ```
 POST /
 
@@ -48,6 +48,26 @@ payload:
 Notes:
 - `"persoon"["rrn"]` does not need formatting.
 
+#### Super request
+If an agent has been granted access to ask for a personURI, without specifiying the organisation, the following request can be done.
+```
+POST /
+
+Content-Type: 'application/ld+json' (or 'application/json')
+
+payload:
+
+{
+    "requester": {
+        "uri": "http://data.lblod.info/vendors/8d91c850-f4e8-43f3-b658-6f5ea2c1787a",
+        "key": "theKey"
+    },
+    "person": {
+        "rrn": "12.34.56-789.12"
+    }
+}
+```
+
 ### Response
 ```
 {
@@ -62,13 +82,13 @@ Notes:
 ### Request model
 See [https://lblod.data.gift/vocabularies/ssn-request](https://lblod.data.gift/vocabularies/ssn-request).
 
-Or with a nice visualisaton:
-[http://visualdataweb.de/webvowl/#iri=https://lblod.data.gift/vocabularies/ssn-request](http://visualdataweb.de/webvowl/#iri=https://lblod.data.gift/vocabularies/ssn-request)
 ### ACL model
 See [https://lblod.data.gift/vocabularies/ssn-acl](https://lblod.data.gift/vocabularies/ssn-acl).
 
-Or with a nice visualisaton:
-[http://visualdataweb.de/webvowl/#iri=https://lblod.data.gift/vocabularies/ssn-acl](http://visualdataweb.de/webvowl/#iri=https://lblod.data.gift/vocabularies/ssn-acl)
+#### Notes
+
+The scope of `muAccount:SSNAccess` is imited to data within a bestuurseenheid
+The scope of `muAccount:SuperSSNAccess` is limited to specific Concept Schemes, currently supported `http://data.lblod.info/id/conceptscheme/LocalPoliticianMandateRole` or `http://data.lblod.info/id/conceptscheme/LocalOfficerMandateRole`.
 
 ## Scripts
 
@@ -79,8 +99,13 @@ The service offers scripts to create migrations.
 Generate a key for a pair of bestuurseenheid and vendor.
 
 ```
-mu script person-uri-for-social-security-number generate-key <vendorUri> <bestuurseenheidUri> <key> <passwordSalt>
+mu script person-uri-for-social-security-number generate-key-regular-requester <vendorUri> <bestuurseenheidUri> <key> <passwordSalt>
 ```
+Generate a key for an aggregated requester
+```
+mu script person-uri-for-social-security-number generate-key-super-requester <vendorUri> <http://theTheme> <key> <passwordSalt>
+```
+Note: `<http://theTheme>` can be either `http://data.lblod.info/id/conceptscheme/LocalPoliticianMandateRole` or `http://data.lblod.info/id/conceptscheme/LocalOfficerMandateRole`
 
 ### Create mandatarissen
 
