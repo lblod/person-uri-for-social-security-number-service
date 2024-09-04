@@ -125,23 +125,21 @@ export async function fetchPersonUriSuperSSNAccess( info ){
 
   if( accessResourceSubjects.includes('http://data.lblod.info/id/conceptscheme/LocalPoliticianMandateRole') ){
     const personMandatarisSelection =
-          `GRAPH ?public {
+          `
              ?bestuurseenheid a besluit:Bestuurseenheid.
              ?bestuursorgaan besluit:bestuurt ?bestuurseenheid.
              ?bestuursorgaanInTijd mandaat:isTijdspecialisatieVan ?bestuursorgaan.
              ?bestuursorgaanInTijd org:hasPost ?mandaat.
              ?mandaat org:role ?role.
              ?role skos:inScheme ?accessResourceSubject.
-           }
 
-           GRAPH ?loketGraph {
              ?mandataris a <http://data.vlaanderen.be/ns/mandaat#Mandataris>.
              ?mandataris org:holds ?mandaat.
              ?mandataris mandaat:isBestuurlijkeAliasVan ?uri.
              ?uri a person:Person;
                adms:identifier ?identifier.
              ?identifier skos:notation ${sparqlEscapeString(rrn)}.
-           }
+
           `;
 
     const selectPoliticalMandatePersonQuery =`
@@ -160,7 +158,7 @@ export async function fetchPersonUriSuperSSNAccess( info ){
 
   if(!uri && accessResourceSubjects.includes('http://data.lblod.info/id/conceptscheme/LocalOfficerMandateRole')) {
     const personLeidinggevendeSelection =
-          `GRAPH ?public {
+          `
              ?bestuurseenheid a besluit:Bestuurseenheid.
              ?bestuursorgaan besluit:bestuurt ?bestuurseenheid.
              ?bestuursorgaanInTijd mandaat:isTijdspecialisatieVan ?bestuursorgaan.
@@ -168,19 +166,15 @@ export async function fetchPersonUriSuperSSNAccess( info ){
              ?bestuursorgaanInTijd lblodlg:heeftBestuursfunctie ?bestuursfunctie.
              ?bestuursfunctie org:role ?role.
              ?role skos:inScheme ?accessResourceSubject.
-           }
 
-           GRAPH ?loketGraph {
              ?functionaris a <http://data.lblod.info/vocabularies/leidinggevenden/Functionaris>.
              ?functionaris org:holds ?bestuursfunctie.
              ?functionaris mandaat:isBestuurlijkeAliasVan ?uri.
-           }
 
-           GRAPH ?loketGraph {
              ?uri a person:Person;
                adms:identifier ?identifier.
              ?identifier skos:notation ${sparqlEscapeString(info.rrn)}.
-           }`;
+           `;
 
     const selectLeidinggevendePersonQuery =`
            ${PREFIXES}
@@ -230,57 +224,49 @@ export async function fetchPersonUriRegularSSNAccess( info ) {
   const prefixes = PREFIXES;
 
   const personKieslijstSelection =
-        `GRAPH ?public {
+        `
            ?bestuursorgaan besluit:bestuurt ${sparqlEscapeUri(info.organization)}.
            ?bestuursorgaanInTijd mandaat:isTijdspecialisatieVan ?bestuursorgaan.
 
            ?verkiezing mandaat:steltSamen ?bestuursorgaanInTijd.
            ?kandidatenlijst mandaat:behoortTot ?verkiezing.
            ?kandidatenlijst mandaat:heeftKandidaat ?uri.
-         }
 
-         GRAPH ?loketGraph {
            ?uri a person:Person;
              adms:identifier ?identifier.
            ?identifier skos:notation ${sparqlEscapeString(info.rrn)}.
-         }`;
+         `;
 
   // mandatarissen in loket with new created persons are not added to a kieslijst
   const personMandatarisSelection =
-        `GRAPH ?public {
+        `
            ?bestuursorgaan besluit:bestuurt ${sparqlEscapeUri(info.organization)}.
            ?bestuursorgaanInTijd mandaat:isTijdspecialisatieVan ?bestuursorgaan.
 
            ?bestuursorgaanInTijd org:hasPost ?mandaat.
            ?mandataris org:holds ?mandaat.
            ?mandataris mandaat:isBestuurlijkeAliasVan ?uri.
-         }
 
-         GRAPH ?loketGraph {
            ?uri a person:Person;
              adms:identifier ?identifier.
            ?identifier skos:notation ${sparqlEscapeString(info.rrn)}.
-         }`;
+         `;
 
 
   const personLeidinggevendeSelection =
-        `GRAPH ?public {
+        `
            ?bestuursorgaan besluit:bestuurt ${sparqlEscapeUri(info.organization)}.
            ?bestuursorgaanInTijd mandaat:isTijdspecialisatieVan ?bestuursorgaan.
 
            ?bestuursorgaanInTijd lblodlg:heeftBestuursfunctie ?bestuursfunctie.
-         }
 
-         GRAPH ?loketGraph {
            ?functionaris org:holds ?bestuursfunctie.
            ?functionaris mandaat:isBestuurlijkeAliasVan ?uri.
-         }
 
-         GRAPH ?loketGraph {
            ?uri a person:Person;
              adms:identifier ?identifier.
            ?identifier skos:notation ${sparqlEscapeString(info.rrn)}.
-         }`;
+         `;
 
   const accessValidation =
         `GRAPH ?accessGraph {
